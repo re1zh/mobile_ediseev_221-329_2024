@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -120,19 +122,73 @@ namespace PrintShapes
             } 
         }
 
+        static string[] GetRectangles(int numberOfRectangles, int spaceBetween, char[] symbols)
+        {
+            int maxWidth = 3 + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
+            int maxHeight = 3 + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
+  
+            string[] rectangles = new string[maxHeight];
+            
+            char[,] canvas = new char[maxHeight, maxWidth];
+
+            for (int i = 0; i < maxHeight; i++)
+                for (int j = 0; j < maxWidth; j++)
+                    canvas[i, j] = ' ';
+
+            for (int level = 0; level < numberOfRectangles; level++)
+            {
+                int currentWidth = 3 + 2 * level + 2 * spaceBetween * level;
+                int currentHeight = 3 + 2 * level + 2 * spaceBetween * level;
+
+                char symbol = symbols[level];
+
+                int startX = (maxWidth - currentWidth) / 2;
+                int startY = (maxHeight - currentHeight) / 2;
+
+                for (int i = startX; i < startX + currentWidth; i++)
+                {
+                    canvas[startY, i] = symbol;
+                    canvas[startY + currentHeight - 1, i] = symbol;
+                }
+
+                for (int i = startY; i < startY + currentHeight; i++)
+                {
+                    canvas[i, startX] = symbol;
+                    canvas[i, startX + currentWidth - 1] = symbol;
+                }
+            }
+
+            for (int i = 0; i < maxHeight; i++)
+            {
+                string line = "";
+                for (int j = 0; j < maxWidth; j++)
+                {
+                    line += canvas[i, j];
+                }
+                rectangles[i] = line;
+            }
+
+            return rectangles;
+        }
+
+        static void PrintRectangles(string[] rectangles)
+        {
+            foreach (var line in rectangles)
+            {
+                Console.WriteLine(line);
+            }
+        }
+
         static void Main(string[] args)
         {
             Console.Write("Введите высоту ромба (нечетное число > 3): ");
             int height = Convert.ToInt32(Console.ReadLine());
-
             Console.Write("Введите символ, из которого будет состоять ромб: ");
             char symbol = Convert.ToChar(Console.ReadLine());
-
             Console.Write("Залить фигуру? (y/n): ");
             bool isFilled = Console.ReadLine() == "y" ? true : false;
-
             string[] rhomb = GetRhomb(height, symbol, isFilled);
-
+            Console.WriteLine();
             PrintRhomb(rhomb);
 
 
@@ -141,16 +197,31 @@ namespace PrintShapes
 
             Console.Write("Введите высоту песочных часов (нечетное число > 3): ");
             height = Convert.ToInt32(Console.ReadLine());
-
             Console.Write("Введите символ, из которого будeт состоять песочные часы: ");
             symbol = Convert.ToChar(Console.ReadLine());
-
             Console.Write("Залить фигуру? (y/n): ");
             isFilled = Console.ReadLine() == "y" ? true : false;
-
             string[] sandClock = GetSandClock(height, symbol, isFilled);
-
+            Console.WriteLine();
             PrintSandClock(sandClock);
+
+
+            Console.WriteLine();
+
+
+            Console.Write("Введите количество прямоугольников: ");
+            int num = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Введите длину промежутка между прямоугольниками: ");
+            int space = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Введите символы, из которого будут состоять прямоугольники: ");
+            char[] symbols = new char[num];
+            for (int i = 0; i < num; i++)
+            {
+                symbols[i] = Convert.ToChar(Console.ReadLine());
+            }
+            string[] rectangles = GetRectangles(num, space, symbols);
+            Console.WriteLine();
+            PrintRectangles(rectangles);
         }
     }
 }
