@@ -122,13 +122,13 @@ namespace PrintShapes
             } 
         }
 
-        static string[] GetRectangles(int numberOfRectangles, int spaceBetween, char[] symbols)
+        static string[] GetRectangles(int numberOfRectangles, int startWidth, int startHeight, int spaceBetween, char[] symbols)
         {
-            int maxWidth = 3 + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
-            int maxHeight = 3 + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
-  
+            int maxWidth = startWidth + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
+            int maxHeight = startHeight + 2 * (numberOfRectangles - 1) + 2 * spaceBetween * (numberOfRectangles - 1);
+
             string[] rectangles = new string[maxHeight];
-            
+
             char[,] canvas = new char[maxHeight, maxWidth];
 
             for (int i = 0; i < maxHeight; i++)
@@ -137,8 +137,8 @@ namespace PrintShapes
 
             for (int level = 0; level < numberOfRectangles; level++)
             {
-                int currentWidth = 3 + 2 * level + 2 * spaceBetween * level;
-                int currentHeight = 3 + 2 * level + 2 * spaceBetween * level;
+                int currentWidth = startWidth + 2 * level + 2 * spaceBetween * level;
+                int currentHeight = startHeight + 2 * level + 2 * spaceBetween * level;
 
                 char symbol = symbols[level];
 
@@ -211,6 +211,10 @@ namespace PrintShapes
 
             Console.Write("Введите количество прямоугольников: ");
             int num = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Введите ширину самого маленького прямоугольника: ");
+            int rec_width = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Введите длину самого маленького прямоугольника: ");
+            int rec_height = Convert.ToInt32(Console.ReadLine());
             Console.Write("Введите длину промежутка между прямоугольниками: ");
             int space = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Введите символы, из которого будут состоять прямоугольники: ");
@@ -219,7 +223,7 @@ namespace PrintShapes
             {
                 symbols[i] = Convert.ToChar(Console.ReadLine());
             }
-            string[] rectangles = GetRectangles(num, space, symbols);
+            string[] rectangles = GetRectangles(num, rec_width, rec_height, space, symbols);
             Console.WriteLine();
             PrintRectangles(rectangles);
         }
