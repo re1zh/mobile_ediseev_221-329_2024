@@ -10,7 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cnsTrainerAccount", "cnsTrainerAccount\cnsTrainerAccount.csproj", "{514D99FA-44F6-4086-9CA9-B4FC1484D284}"
 	ProjectSection(ProjectDependencies) = postProject
 		{66C39229-EC96-4B31-AFCE-6EFB1B25884E} = {66C39229-EC96-4B31-AFCE-6EFB1B25884E}
-		{BF232690-A27E-45D9-A990-588EECFA1DBB} = {BF232690-A27E-45D9-A990-588EECFA1DBB}
 	EndProjectSection
 EndProject
 Global
