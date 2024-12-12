@@ -1,12 +1,12 @@
 using AudioPlayerLib;
+using AxWMPLib;
 using System.DirectoryServices;
+using WMPLib;
 
 namespace AudioPlayer1
 {
     public partial class Form1 : Form
     {
-        //private readonly AudioPlayer audioPlayer = new();
-
         public Form1()
         {
             InitializeComponent();
@@ -20,16 +20,6 @@ namespace AudioPlayer1
         private List<string> paths = new List<string>();
         private List<string> files = new List<string>();
 
-        //private void UpdatePlaylistDisplay()
-        //{
-        //    filesListBox.Items.Clear();
-        //    for (int i = 0; i < audioPlayer.GetPlaylist().Count; i++)
-        //    {
-        //        string prefix = i == audioPlayer.GetCurrentTrackIndex() ? "-> " : "   ";
-        //        filesListBox.Items.Add($"{prefix}{audioPlayer.GetPlaylist()[i]}");
-        //    }
-        //}
-
         private void openFilesButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -40,44 +30,18 @@ namespace AudioPlayer1
                 string[] newFiles = ofd.SafeFileNames;
                 string[] newPaths = ofd.FileNames;
 
-                //Player.AddFiles(newFiles, newPaths);
-
                 for (int i = 0; i < newPaths.Length; i++)
                 {
-                    //if (!paths.Contains(newPaths[i]))
-                    //{
-
-                    //}
-
                     filesListBox.Items.Add(newFiles[i]);
                     paths.Add(newPaths[i]);
                     files.Add(newFiles[i]);
                 }
             }
 
-            //if (ofd.ShowDialog() == DialogResult.OK && ofd.FileNames.Length > 0)
-            //{
-            //    foreach (var file in ofd.FileNames)
-            //    {
-            //        audioPlayer.AddToPlaylist(file);
-            //    }
-            //    UpdatePlaylistDisplay();
-            //}
-
-            var startVolume = 50;
+            var startVolume = 25;
             volumeBar.Value = startVolume;
             volumeLabel.Text = volumeBar.Value.ToString();
         }
-
-        //private void filesListBox_DoubleClick(object sender, EventArgs e)
-        //{
-        //    int selectedIndex = filesListBox.SelectedIndex;
-        //    if (selectedIndex >= 0)
-        //    {
-        //        audioPlayer.SelectTrack(selectedIndex);
-        //        UpdatePlaylistDisplay();
-        //    }
-        //}
 
         private void filesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -95,9 +59,6 @@ namespace AudioPlayer1
 
         private void playButton_Click(object sender, EventArgs e)
         {
-            //audioPlayer.Play();
-            //UpdatePlaylistDisplay();
-
             if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
             {
                 axWindowsMediaPlayer1.Ctlcontrols.play();
@@ -147,7 +108,7 @@ namespace AudioPlayer1
             {
                 if (filesListBox.SelectedIndex < filesListBox.Items.Count - 1)
                 {
-                    filesListBox.SelectedIndex = filesListBox.SelectedIndex + 1;
+                    filesListBox.SelectedIndex = (filesListBox.SelectedIndex + 1) % filesListBox.Items.Count;
                 }
             }
             else
@@ -165,7 +126,7 @@ namespace AudioPlayer1
             {
                 if (filesListBox.SelectedIndex > 0)
                 {
-                    filesListBox.SelectedIndex = filesListBox.SelectedIndex - 1;
+                    filesListBox.SelectedIndex = (filesListBox.SelectedIndex - 1 + filesListBox.Items.Count) % filesListBox.Items.Count;
                 }
             }
             else
@@ -182,29 +143,6 @@ namespace AudioPlayer1
             axWindowsMediaPlayer1.settings.volume = volumeBar.Value;
 
             volumeLabel.Text = volumeBar.Value.ToString();
-        }
-
-        private void axWindowsMediaPlayer1_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
-        {
-            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
-            {
-                progressBar.Maximum = (int)axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration;
-                timer1.Start();
-            }
-            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPaused)
-            {
-                timer1.Stop();
-            }
-            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsStopped)
-            {
-                timer1.Stop();
-                progressBar.Value = 0;
-
-                progressStartLabel.Text = "00:00";
-                progressEndLabel.Text = "00:00";
-
-                songBar.Value = 0;
-            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -287,6 +225,29 @@ namespace AudioPlayer1
             {
                 MessageBox.Show("Для перемешивания должен быть хотя бы один файл в плейлисте.",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void axWindowsMediaPlayer1_PlayStateChange(object sender, _WMPOCXEvents_PlayStateChangeEvent e)
+        {
+            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
+            {
+                progressBar.Maximum = (int)axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration;
+                timer1.Start();
+            }
+            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPaused)
+            {
+                timer1.Stop();
+            }
+            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsStopped)
+            {
+                timer1.Stop();
+                progressBar.Value = 0;
+
+                progressStartLabel.Text = "00:00";
+                progressEndLabel.Text = "00:00";
+
+                songBar.Value = 0;
             }
         }
     }

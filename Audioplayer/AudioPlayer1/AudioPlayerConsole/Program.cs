@@ -11,38 +11,39 @@ namespace AudioPlayerApp
 
             while (true)
             {
-                Console.WriteLine("\nCommands: ");
-                Console.WriteLine("1 - Add track");
-                Console.WriteLine("2 - Remove track");
-                Console.WriteLine("3 - Play");
-                Console.WriteLine("4 - Pause");
-                Console.WriteLine("5 - Stop");
-                Console.WriteLine("6 - Next");
-                Console.WriteLine("7 - Previous");
-                Console.WriteLine("8 - Shuffle");
-                Console.WriteLine("9 - Print playlist");
-                Console.WriteLine("10 - Select track");
-                Console.WriteLine("0 - Exit");
+                Console.WriteLine("\nКомманды: ");
+                Console.WriteLine("1 - Добавить трек в плейлист");
+                Console.WriteLine("2 - Убрать трек из плейлиста");
+                Console.WriteLine("3 - Играть");
+                Console.WriteLine("4 - Пауза");
+                Console.WriteLine("5 - Стоп");
+                Console.WriteLine("6 - След. трек");
+                Console.WriteLine("7 - Пред. трек");
+                Console.WriteLine("8 - Перемешать");
+                Console.WriteLine("9 - Вывести плейлист");
+                Console.WriteLine("10 - Выбрать трек");
+                Console.WriteLine("11 - Установить громкость");
+                Console.WriteLine("0 - Выход");
 
-                Console.Write("\nEnter command: ");
+                Console.Write("\nВведите команду: ");
                 string command = Console.ReadLine();
 
                 switch (command)
                 {
                     case "1":
-                        Console.Write("Enter path to audio file: ");
+                        Console.Write("Введите путь до аудиофайла: ");
                         string path = Console.ReadLine();
                         player.AddToPlaylist(path);
                         break;
                     case "2":
-                        Console.Write("Enter index of track to remove: ");
+                        Console.Write("Введите номер трека для удаления: ");
                         if (int.TryParse(Console.ReadLine(), out int removeIndex))
                         {
                             player.RemoveFromPlaylist(removeIndex - 1);
                         }
                         else
                         {
-                            Console.WriteLine("Invalid input.");
+                            Console.WriteLine("Ошибка.");
                         }
                         break;
                     case "3":
@@ -67,20 +68,32 @@ namespace AudioPlayerApp
                         player.PrintPlaylist();
                         break;
                     case "10":
-                        Console.Write("Enter track index: ");
+                        Console.Write("Введите номер трека для выбора: ");
                         if (int.TryParse(Console.ReadLine(), out int selectIndex))
                         {
                             player.SelectTrack(selectIndex - 1);
                         }
                         else
                         {
-                            Console.WriteLine("Invalid input.");
+                            Console.WriteLine("Ошибка.");
+                        }
+                        break;
+                    case "11":
+                        Console.Write("Введите уровень громкости (0-100): ");
+                        if (int.TryParse(Console.ReadLine(), out int volume) && volume >= 0 && volume <= 100)
+                        {
+                            player.SetVolume(volume);
+                            Console.WriteLine($"Громкость установлена на {volume}%.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Некорректное значение громкости. Введите число от 0 до 100.");
                         }
                         break;
                     case "0":
                         return;
                     default:
-                        Console.WriteLine("Unknown command.");
+                        Console.WriteLine("Такой команды не существует.");
                         break;
                 }
             }

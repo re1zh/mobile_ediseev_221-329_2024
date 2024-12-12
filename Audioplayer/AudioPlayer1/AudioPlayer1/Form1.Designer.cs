@@ -53,7 +53,6 @@
             timer1 = new System.Windows.Forms.Timer(components);
             songBar = new TrackBar();
             shuffleButton = new Button();
-            loopButton = new Button();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -189,10 +188,10 @@
             // axWindowsMediaPlayer1
             // 
             axWindowsMediaPlayer1.Enabled = true;
-            axWindowsMediaPlayer1.Location = new Point(3, 3);
+            axWindowsMediaPlayer1.Location = new Point(0, 0);
             axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
             axWindowsMediaPlayer1.OcxState = (AxHost.State)resources.GetObject("axWindowsMediaPlayer1.OcxState");
-            axWindowsMediaPlayer1.Size = new Size(759, 384);
+            axWindowsMediaPlayer1.Size = new Size(768, 410);
             axWindowsMediaPlayer1.TabIndex = 0;
             axWindowsMediaPlayer1.PlayStateChange += axWindowsMediaPlayer1_PlayStateChange;
             // 
@@ -239,7 +238,6 @@
             filesListBox.Size = new Size(559, 280);
             filesListBox.TabIndex = 0;
             filesListBox.SelectedIndexChanged += filesListBox_SelectedIndexChanged;
-            //filesListBox.DoubleClick += filesListBox_DoubleClick;
             // 
             // tabPage3
             // 
@@ -287,29 +285,18 @@
             // 
             shuffleButton.BackgroundImage = (Image)resources.GetObject("shuffleButton.BackgroundImage");
             shuffleButton.BackgroundImageLayout = ImageLayout.Stretch;
-            shuffleButton.Location = new Point(437, 406);
+            shuffleButton.Location = new Point(463, 406);
             shuffleButton.Name = "shuffleButton";
             shuffleButton.Size = new Size(42, 45);
             shuffleButton.TabIndex = 14;
             shuffleButton.UseVisualStyleBackColor = true;
             shuffleButton.Click += shuffleButton_Click;
             // 
-            // loopButton
-            // 
-            loopButton.BackgroundImage = (Image)resources.GetObject("loopButton.BackgroundImage");
-            loopButton.BackgroundImageLayout = ImageLayout.Stretch;
-            loopButton.Location = new Point(485, 406);
-            loopButton.Name = "loopButton";
-            loopButton.Size = new Size(42, 45);
-            loopButton.TabIndex = 15;
-            loopButton.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 465);
-            Controls.Add(loopButton);
             Controls.Add(shuffleButton);
             Controls.Add(labelPerc);
             Controls.Add(tabControl1);
@@ -354,7 +341,6 @@
         private Label volumeLabel;
         private TabControl tabControl1;
         private TabPage tabPage1;
-        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
         private TabPage tabPage2;
         private Button openFilesButton;
         private ListBox filesListBox;
@@ -365,6 +351,6 @@
         private TrackBar songBar;
         private Button deleteButton;
         private Button shuffleButton;
-        private Button loopButton;
+        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
     }
 }
