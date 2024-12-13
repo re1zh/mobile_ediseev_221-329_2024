@@ -42,7 +42,7 @@
             volumeLabel = new Label();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
-            axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
+            currentSongLabel = new Label();
             tabPage2 = new TabPage();
             deleteButton = new Button();
             openFilesButton = new Button();
@@ -56,7 +56,6 @@
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)axWindowsMediaPlayer1).BeginInit();
             tabPage2.SuspendLayout();
             tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)songBar).BeginInit();
@@ -176,7 +175,7 @@
             // 
             // tabPage1
             // 
-            tabPage1.Controls.Add(axWindowsMediaPlayer1);
+            tabPage1.Controls.Add(currentSongLabel);
             tabPage1.Location = new Point(4, 29);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
@@ -185,15 +184,15 @@
             tabPage1.Text = "Главная";
             tabPage1.UseVisualStyleBackColor = true;
             // 
-            // axWindowsMediaPlayer1
+            // currentSongLabel
             // 
-            axWindowsMediaPlayer1.Enabled = true;
-            axWindowsMediaPlayer1.Location = new Point(0, 0);
-            axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
-            axWindowsMediaPlayer1.OcxState = (AxHost.State)resources.GetObject("axWindowsMediaPlayer1.OcxState");
-            axWindowsMediaPlayer1.Size = new Size(768, 410);
-            axWindowsMediaPlayer1.TabIndex = 0;
-            axWindowsMediaPlayer1.PlayStateChange += axWindowsMediaPlayer1_PlayStateChange;
+            currentSongLabel.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            currentSongLabel.Location = new Point(50, 112);
+            currentSongLabel.Name = "currentSongLabel";
+            currentSongLabel.Size = new Size(661, 77);
+            currentSongLabel.TabIndex = 0;
+            currentSongLabel.Text = "Сейчас ничего не играет";
+            currentSongLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // tabPage2
             // 
@@ -252,12 +251,13 @@
             // label1
             // 
             label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            label1.Font = new Font("Segoe UI Semibold", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 204);
             label1.Location = new Point(12, 11);
             label1.Name = "label1";
-            label1.Size = new Size(377, 289);
+            label1.Size = new Size(750, 289);
             label1.TabIndex = 0;
             label1.Text = "Проект разработан в рамках дисциплины \"Разработка мобильных приложений\"\r\nстудентом группы 221-329 Едисеевым Олегом Владимировичем\r\n\r\nПроект №13 - Аудиоплеер";
-            label1.TextAlign = ContentAlignment.MiddleLeft;
+            label1.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // labelPerc
             // 
@@ -319,7 +319,6 @@
             ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)axWindowsMediaPlayer1).EndInit();
             tabPage2.ResumeLayout(false);
             tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)songBar).EndInit();
@@ -351,6 +350,6 @@
         private TrackBar songBar;
         private Button deleteButton;
         private Button shuffleButton;
-        private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
+        private Label currentSongLabel;
     }
 }

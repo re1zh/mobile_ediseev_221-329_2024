@@ -1,220 +1,226 @@
 using AudioPlayerLib;
 using AxWMPLib;
 using System.DirectoryServices;
+using System.Numerics;
 using WMPLib;
+using static AudioPlayerLib.AudioPlayer;
 
 namespace AudioPlayer1
 {
     public partial class Form1 : Form
     {
+        private AudioPlayer player;
+        private List<string> files = new List<string>();
+
         public Form1()
         {
             InitializeComponent();
+            player = new AudioPlayer();
+            player.OnTrackChanged += UpdateFilesListBoxSelection;
+            player.OnTrackChanged += UpdateNowPlayingLabel;
+            player.OnPlayStateChanged += HandlePlayStateChanged;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            volumeBar.Value = 25;
+            volumeLabel.Text = volumeBar.Value.ToString();
+            player.SetVolume(volumeBar.Value);
+        }
+        private void UpdatePlaylistDisplay()
+        {
+            filesListBox.Items.Clear();
+            foreach (var file in player.GetPlaylist())
+            {
+                filesListBox.Items.Add(Path.GetFileName(file));
+            }
         }
 
-        private List<string> paths = new List<string>();
-        private List<string> files = new List<string>();
+        private void UpdateTrackSelection()
+        {
+            int currentIndex = player.GetCurrentTrackIndex();
+            if (currentIndex >= 0 && currentIndex < filesListBox.Items.Count)
+            {
+                filesListBox.SelectedIndex = currentIndex;
+            }
+        }
+
+        private void UpdateNowPlayingLabel(int trackIndex)
+        {
+            if (trackIndex >= 0 && trackIndex < player.GetPlaylist().Count)
+            {
+                currentSongLabel.Text = $"Сейчас играет: {player.GetPlaylist()[trackIndex]}";
+            }
+            else
+            {
+                currentSongLabel.Text = "Сейчас ничего не играет";
+            }
+        }
+
+        private void UpdateProgressBar()
+        {
+            songBar.Maximum = (int)player.GetDuration();
+            songBar.Value = (int)player.GetCurrentPosition();
+        }
+
+        private void ResetProgressBar()
+        {
+            songBar.Value = 0;
+            progressBar.Value = 0;
+            progressStartLabel.Text = "00:00";
+            progressEndLabel.Text = "00:00";
+        }
+
+        private void UpdateFilesListBoxSelection(int trackIndex)
+        {
+            if (trackIndex >= 0 && trackIndex < filesListBox.Items.Count)
+            {
+                filesListBox.SelectedIndex = trackIndex;
+            }
+        }
 
         private void openFilesButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
 
-            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK && ofd.FileName != null)
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                string[] newFiles = ofd.SafeFileNames;
-                string[] newPaths = ofd.FileNames;
-
-                for (int i = 0; i < newPaths.Length; i++)
+                foreach (string file in ofd.FileNames)
                 {
-                    filesListBox.Items.Add(newFiles[i]);
-                    paths.Add(newPaths[i]);
-                    files.Add(newFiles[i]);
+                    filesListBox.Items.Add(Path.GetFileName(file));
+                    files.Add(file);
+                    player.AddToPlaylist(file);
                 }
             }
-
-            var startVolume = 25;
-            volumeBar.Value = startVolume;
-            volumeLabel.Text = volumeBar.Value.ToString();
         }
 
+        private void filesListBox_DoubleClick(object sender, EventArgs e)
+        {
+            int selectedIndex = filesListBox.SelectedIndex;
+
+            if (selectedIndex >= 0)
+            {
+                player.SelectTrack(selectedIndex);
+                UpdatePlaylistDisplay();
+            }
+        }
         private void filesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selectedIndex = filesListBox.SelectedIndex;
 
-            if (selectedIndex >= 0 && selectedIndex < paths.Count)
+            if (selectedIndex >= 0 && selectedIndex < files.Count)
             {
-                axWindowsMediaPlayer1.URL = paths[selectedIndex];
-            }
-            else
-            {
-                axWindowsMediaPlayer1.URL = null;
+                player.SelectTrack(selectedIndex);
+                player.Play();
             }
         }
 
         private void playButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
+            if (files.Count > 0 && filesListBox.SelectedIndex >= 0)
             {
-                axWindowsMediaPlayer1.Ctlcontrols.play();
+                player.Play();
+                UpdateProgressBar();
             }
             else
             {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-                axWindowsMediaPlayer1.URL = null;
-                MessageBox.Show("Плейлист пуст. Добавьте файлы для воспроизведения."
-                    , "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Плейлист пуст.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void pauseButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.pause();
-            }
-            else
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-                axWindowsMediaPlayer1.URL = null;
-                MessageBox.Show("Плейлист пуст. Добавьте файлы для воспроизведения."
-                    , "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            player.Pause();
         }
 
         private void stopButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-            }
-            else
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-                axWindowsMediaPlayer1.URL = null;
-                MessageBox.Show("Плейлист пуст. Добавьте файлы для воспроизведения."
-                    , "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            player.Stop();
+            ResetProgressBar();
         }
 
         private void skipButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
-            {
-                if (filesListBox.SelectedIndex < filesListBox.Items.Count - 1)
-                {
-                    filesListBox.SelectedIndex = (filesListBox.SelectedIndex + 1) % filesListBox.Items.Count;
-                }
-            }
-            else
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-                axWindowsMediaPlayer1.URL = null;
-                MessageBox.Show("Плейлист пуст. Добавьте файлы для воспроизведения."
-                    , "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            player.Next();
+            UpdateTrackSelection();
         }
 
         private void backButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
-            {
-                if (filesListBox.SelectedIndex > 0)
-                {
-                    filesListBox.SelectedIndex = (filesListBox.SelectedIndex - 1 + filesListBox.Items.Count) % filesListBox.Items.Count;
-                }
-            }
-            else
-            {
-                axWindowsMediaPlayer1.Ctlcontrols.stop();
-                axWindowsMediaPlayer1.URL = null;
-                MessageBox.Show("Плейлист пуст. Добавьте файлы для воспроизведения."
-                    , "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
+            player.Previous();
+            UpdateTrackSelection();
         }
 
         private void volumeBar_Scroll(object sender, EventArgs e)
         {
-            axWindowsMediaPlayer1.settings.volume = volumeBar.Value;
-
+            player.SetVolume(volumeBar.Value);
             volumeLabel.Text = volumeBar.Value.ToString();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            songBar.Maximum = Convert.ToInt32(axWindowsMediaPlayer1.currentMedia.duration);
-            songBar.Value = Convert.ToInt32(axWindowsMediaPlayer1.Ctlcontrols.currentPosition);
+            songBar.Maximum = Convert.ToInt32(player.GetDuration());
+            songBar.Value = Convert.ToInt32(player.GetCurrentPosition());
 
-            progressStartLabel.Text = axWindowsMediaPlayer1.Ctlcontrols.currentPositionString;
-            progressEndLabel.Text = axWindowsMediaPlayer1.Ctlcontrols.currentItem.durationString.ToString();
+            progressStartLabel.Text = player.GetCurrentPositionString();
+            progressEndLabel.Text = player.GetDurationString().ToString();
 
-            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
+            progressBar.Maximum = Convert.ToInt32(player.GetDuration());
+
+            if (player.isPlaying())
             {
-                progressBar.Value = (int)axWindowsMediaPlayer1.Ctlcontrols.currentPosition;
+                progressBar.Value = (int)player.GetCurrentPosition();
+            }
+        }
+
+        private void HandlePlayStateChanged(PlayerState state)
+        {
+            switch (state)
+            {
+                case PlayerState.Playing:
+                    timer1.Start();
+                    break;
+                case PlayerState.Paused:
+                    timer1.Stop();
+                    break;
+                case PlayerState.Stopped:
+                    timer1.Stop();
+                    ResetProgressBar();
+                    break;
             }
         }
 
         private void songBar_Scroll(object sender, EventArgs e)
         {
-            axWindowsMediaPlayer1.Ctlcontrols.currentPosition = songBar.Value;
+            player.SetCurrentPosition(songBar.Value);
         }
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            if (paths.Count > 0 && filesListBox.SelectedIndex >= 0)
+            int selectedIndex = filesListBox.SelectedIndex;
+
+            if (selectedIndex >= 0 && selectedIndex < files.Count)
             {
-                int selectedIndex = filesListBox.SelectedIndex;
+                player.RemoveFromPlaylist(selectedIndex);
+                files.RemoveAt(selectedIndex);
+                filesListBox.Items.RemoveAt(selectedIndex);
 
-                if (selectedIndex >= 0 && selectedIndex < filesListBox.Items.Count)
+                if (filesListBox.Items.Count > 0)
                 {
-                    axWindowsMediaPlayer1.Ctlcontrols.stop();
-
-                    files.RemoveAt(selectedIndex);
-                    paths.RemoveAt(selectedIndex);
-
-                    filesListBox.Items.RemoveAt(selectedIndex);
-
-                    if (filesListBox.Items.Count > 0)
-                    {
-                        int newIndex = Math.Min(selectedIndex, filesListBox.Items.Count - 1);
-                        filesListBox.SelectedIndex = newIndex;
-
-                        axWindowsMediaPlayer1.URL = paths[newIndex];
-                    }
-                    else
-                    {
-                        axWindowsMediaPlayer1.URL = null;
-                    }
+                    filesListBox.SelectedIndex = Math.Min(selectedIndex, filesListBox.Items.Count - 1);
                 }
             }
         }
 
         private void shuffleButton_Click(object sender, EventArgs e)
         {
-            if (files.Count > 1)
+            if (filesListBox.Items.Count > 1)
             {
-                Random rand = new Random();
-
-                for (int i = paths.Count - 1; i > 0; i--)
-                {
-                    int j = rand.Next(i + 1);
-
-                    string tempPath = paths[i];
-                    paths[i] = paths[j];
-                    paths[j] = tempPath;
-
-                    string tempFile = files[i];
-                    files[i] = files[j];
-                    files[j] = tempFile;
-                }
+                player.Shuffle();
 
                 filesListBox.Items.Clear();
-                filesListBox.Items.AddRange(files.ToArray());
+                filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
 
                 if (filesListBox.Items.Count > 0)
                 {
@@ -223,31 +229,8 @@ namespace AudioPlayer1
             }
             else
             {
-                MessageBox.Show("Для перемешивания должен быть хотя бы один файл в плейлисте.",
+                MessageBox.Show("Для перемешивания должно быть хотя бы два файла в плейлисте.",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private void axWindowsMediaPlayer1_PlayStateChange(object sender, _WMPOCXEvents_PlayStateChangeEvent e)
-        {
-            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
-            {
-                progressBar.Maximum = (int)axWindowsMediaPlayer1.Ctlcontrols.currentItem.duration;
-                timer1.Start();
-            }
-            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPaused)
-            {
-                timer1.Stop();
-            }
-            else if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsStopped)
-            {
-                timer1.Stop();
-                progressBar.Value = 0;
-
-                progressStartLabel.Text = "00:00";
-                progressEndLabel.Text = "00:00";
-
-                songBar.Value = 0;
             }
         }
     }

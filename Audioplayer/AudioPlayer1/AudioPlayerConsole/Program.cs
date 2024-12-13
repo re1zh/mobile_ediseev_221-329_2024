@@ -5,6 +5,21 @@ namespace AudioPlayerApp
 {
     internal class Program
     {
+        static bool ParseTime(string input, out double seconds)
+        {
+            seconds = 0;
+            string[] parts = input.Split(':');
+
+            if (parts.Length == 2
+                && int.TryParse(parts[0], out int mins)
+                && int.TryParse(parts[1], out int secs))
+            {
+                seconds = mins * 60 + secs;
+                return true;
+            }
+
+            return false;
+        }
         static void Main(string[] args)
         {
             AudioPlayer player = new AudioPlayer();
@@ -23,6 +38,7 @@ namespace AudioPlayerApp
                 Console.WriteLine("9 - Вывести плейлист");
                 Console.WriteLine("10 - Выбрать трек");
                 Console.WriteLine("11 - Установить громкость");
+                Console.WriteLine("12 - Перемотка трека");
                 Console.WriteLine("0 - Выход");
 
                 Console.Write("\nВведите команду: ");
@@ -89,6 +105,26 @@ namespace AudioPlayerApp
                         {
                             Console.WriteLine("Некорректное значение громкости. Введите число от 0 до 100.");
                         }
+                        break;
+                    case "12":
+                        double duration = player.GetDuration();
+                        int min = (int)duration / 60;
+                        int sec = (int)duration % 60;
+
+                        Console.WriteLine($"Длина текущего трека: {min:D2}:{sec:D2}");
+                        Console.Write("Введите момент для перемотки (ММ:СС): ");
+                        string input = Console.ReadLine();
+
+                        if (ParseTime(input, out double newPosition) && newPosition <= duration)
+                        {
+                            player.SetCurrentPosition(newPosition);
+                            Console.WriteLine($"Перемотано на {input}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ошибка. Неверный формат или превышено время трека.");
+                        }
+
                         break;
                     case "0":
                         return;

@@ -13,16 +13,59 @@ namespace AudioPlayerLib
 
         private int currentTrackIndex = -1;
 
+        public event Action<int>? OnTrackChanged;
+        public enum PlayerState
+        {
+            Playing,
+            Paused,
+            Stopped
+        }
+
+        public event Action<PlayerState> OnPlayStateChanged;
+
+        private void OnPlayStateChange(int newState)
+        {
+            WMPPlayState state = (WMPPlayState)newState;
+
+            switch (state)
+            {
+                case WMPPlayState.wmppsPlaying:
+                    OnPlayStateChanged?.Invoke(PlayerState.Playing);
+                    break;
+                case WMPPlayState.wmppsPaused:
+                    OnPlayStateChanged?.Invoke(PlayerState.Paused);
+                    break;
+                case WMPPlayState.wmppsStopped:
+                    OnPlayStateChanged?.Invoke(PlayerState.Stopped);
+                    break;
+                case WMPPlayState.wmppsMediaEnded:
+                    Next();
+                    OnTrackChanged?.Invoke(currentTrackIndex);
+                    break;
+                case WMPPlayState.wmppsReady:
+                    if (currentTrackIndex != -1)
+                    {
+                        Play();
+                    }
+                    break;
+                        
+            }
+        }
+
         public AudioPlayer()
         {
             wmp.settings.volume = 25;
-            wmp.PlayStateChange += OnPlayStateChange; // Подписываемся на событие
+            wmp.PlayStateChange += OnPlayStateChange;
         }
-
 
         public List<string> GetPlaylist() => new List<string>(safeFileNames);
         public int GetCurrentTrackIndex() => currentTrackIndex;
+
         public WMPPlayState CurrentState => wmp.playState;
+        public void SetURL(string path)
+        {
+            wmp.URL = path;
+        }
         public int GetVolume()
         {
             return wmp?.settings.volume ?? 25;
@@ -31,6 +74,10 @@ namespace AudioPlayerLib
         {
             return wmp.controls.currentPosition;
         }
+        public string GetCurrentPositionString()
+        {
+            return wmp.controls.currentPositionString;
+        }
         public void SetCurrentPosition(double position)
         {
             wmp.controls.currentPosition = position;
@@ -38,6 +85,10 @@ namespace AudioPlayerLib
         public double GetDuration()
         {
             return wmp.currentMedia?.duration ?? 0;
+        }
+        public string GetDurationString()
+        {
+            return wmp.controls.currentItem.durationString;
         }
         public bool isPlaying()
         {
@@ -79,6 +130,8 @@ namespace AudioPlayerLib
             if (index >= 0 && index < playlistPaths.Count)
             {
                 currentTrackIndex = index;
+                wmp.URL = playlistPaths[currentTrackIndex];
+                OnTrackChanged?.Invoke(currentTrackIndex);
                 Play();
             }
             else
@@ -99,6 +152,10 @@ namespace AudioPlayerLib
                     }
                     wmp.controls.play();
                 }
+            }
+            else if (isPlaying())
+            {
+                Console.WriteLine("Трек уже играет.");
             }
             else
             {
@@ -126,7 +183,10 @@ namespace AudioPlayerLib
             if (playlistPaths.Count > 0 && currentTrackIndex >= 0)
             {
                 currentTrackIndex = (currentTrackIndex + 1) % playlistPaths.Count;
+
                 Console.WriteLine($"Следующий трек: {safeFileNames[currentTrackIndex]}");
+
+                wmp.URL = playlistPaths[currentTrackIndex];
                 Play();
             }
             else
@@ -140,6 +200,7 @@ namespace AudioPlayerLib
             if (playlistPaths.Count > 0 && currentTrackIndex >= 0)
             {
                 currentTrackIndex = (currentTrackIndex - 1 + playlistPaths.Count) % playlistPaths.Count;
+                wmp.URL = playlistPaths[currentTrackIndex];
                 Play();
             } 
             else
@@ -168,7 +229,13 @@ namespace AudioPlayerLib
                 (playlistPaths[i], playlistPaths[j]) = (playlistPaths[j], playlistPaths[i]);
                 (safeFileNames[i], safeFileNames[j]) = (safeFileNames[j], safeFileNames[i]);
             }
-            currentTrackIndex = -1;
+
+            currentTrackIndex = 0;
+            if (playlistPaths.Count > 0)
+            {
+                wmp.URL = playlistPaths[currentTrackIndex];
+                Play();
+            }
         }
 
         public void PrintPlaylist()
@@ -183,22 +250,7 @@ namespace AudioPlayerLib
             for (int i = 0; i < playlistPaths.Count; i++)
             {
                 string prefix = i == currentTrackIndex ? "-> " : "   ";
-                Console.WriteLine($"{prefix}{i + 1}. {playlistPaths[i]}");
-            }
-        }
-        private void OnPlayStateChange(int newState)
-        {
-            //Console.WriteLine($"Состояние изменилось: {(WMPPlayState)newState}");
-
-            if ((WMPPlayState)newState == WMPPlayState.wmppsMediaEnded)
-            {
-                Console.WriteLine("Трек завершён. Переход к следующему.");
-                Next();
-            }
-            else if ((WMPPlayState)newState == WMPPlayState.wmppsReady && currentTrackIndex != -1)
-            {
-                Console.WriteLine("Плеер остановлен. Запуск текущего трека.");
-                Play();
+                Console.WriteLine($"{prefix}{i + 1}. {safeFileNames[i]}");
             }
         }
     }
