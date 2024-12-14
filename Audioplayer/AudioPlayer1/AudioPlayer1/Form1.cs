@@ -4,6 +4,7 @@ using System.DirectoryServices;
 using System.Numerics;
 using WMPLib;
 using static AudioPlayerLib.AudioPlayer;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace AudioPlayer1
 {
@@ -15,10 +16,14 @@ namespace AudioPlayer1
         public Form1()
         {
             InitializeComponent();
+
             player = new AudioPlayer();
+
             player.OnTrackChanged += UpdateFilesListBoxSelection;
-            player.OnTrackChanged += UpdateNowPlayingLabel;
+            player.OnTrackChanged += index => UpdateLabels();
             player.OnPlayStateChanged += HandlePlayStateChanged;
+
+            UpdateLabels();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -27,6 +32,7 @@ namespace AudioPlayer1
             volumeLabel.Text = volumeBar.Value.ToString();
             player.SetVolume(volumeBar.Value);
         }
+
         private void UpdatePlaylistDisplay()
         {
             filesListBox.Items.Clear();
@@ -45,16 +51,26 @@ namespace AudioPlayer1
             }
         }
 
-        private void UpdateNowPlayingLabel(int trackIndex)
+        private void UpdateLabels()
         {
-            if (trackIndex >= 0 && trackIndex < player.GetPlaylist().Count)
+            int currentIndex = player.GetCurrentTrackIndex();
+            List<string> playlist = player.GetPlaylist();
+
+            if (playlist.Count == 0 || currentIndex == -1)
             {
-                currentSongLabel.Text = $"Сейчас играет: {player.GetPlaylist()[trackIndex]}";
+                prevSongLabel.Text = "Предыдущий: Ничего";
+                currentSongLabel.Text = "Сейчас играет: Ничего";
+                nextSongLabel.Text = "Следующий: Ничего";
+                return;
             }
-            else
-            {
-                currentSongLabel.Text = "Сейчас ничего не играет";
-            }
+
+            currentSongLabel.Text = $"Сейчас играет: {playlist[currentIndex]}";
+
+            int previousIndex = (currentIndex - 1 + playlist.Count) % playlist.Count;
+            prevSongLabel.Text = $"Предыдущий: {playlist[previousIndex]}";
+
+            int nextIndex = (currentIndex + 1) % playlist.Count;
+            nextSongLabel.Text = $"Следующий: {playlist[nextIndex]}";
         }
 
         private void UpdateProgressBar()

@@ -62,10 +62,6 @@ namespace AudioPlayerLib
         public int GetCurrentTrackIndex() => currentTrackIndex;
 
         public WMPPlayState CurrentState => wmp.playState;
-        public void SetURL(string path)
-        {
-            wmp.URL = path;
-        }
         public int GetVolume()
         {
             return wmp?.settings.volume ?? 25;
