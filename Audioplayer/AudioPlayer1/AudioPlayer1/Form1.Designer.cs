@@ -42,6 +42,7 @@
             volumeLabel = new Label();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            wavePictureBox = new PictureBox();
             prevSongLabel = new Label();
             nextSongLabel = new Label();
             currentSongLabel = new Label();
@@ -58,6 +59,7 @@
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)wavePictureBox).BeginInit();
             tabPage2.SuspendLayout();
             tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)songBar).BeginInit();
@@ -126,6 +128,7 @@
             // progressBar
             // 
             progressBar.Location = new Point(12, 384);
+            progressBar.MarqueeAnimationSpeed = 0;
             progressBar.Name = "progressBar";
             progressBar.Size = new Size(776, 10);
             progressBar.TabIndex = 5;
@@ -152,11 +155,12 @@
             // 
             // volumeBar
             // 
-            volumeBar.Location = new Point(559, 400);
+            volumeBar.Location = new Point(559, 406);
             volumeBar.Maximum = 100;
             volumeBar.Name = "volumeBar";
             volumeBar.Size = new Size(162, 56);
             volumeBar.TabIndex = 8;
+            volumeBar.TickStyle = TickStyle.None;
             volumeBar.Scroll += volumeBar_Scroll;
             // 
             // volumeLabel
@@ -183,6 +187,7 @@
             // tabPage1
             // 
             tabPage1.BackColor = Color.PaleTurquoise;
+            tabPage1.Controls.Add(wavePictureBox);
             tabPage1.Controls.Add(prevSongLabel);
             tabPage1.Controls.Add(nextSongLabel);
             tabPage1.Controls.Add(currentSongLabel);
@@ -193,33 +198,41 @@
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Главная";
             // 
+            // wavePictureBox
+            // 
+            wavePictureBox.Location = new Point(-4, 253);
+            wavePictureBox.Name = "wavePictureBox";
+            wavePictureBox.Size = new Size(776, 60);
+            wavePictureBox.TabIndex = 3;
+            wavePictureBox.TabStop = false;
+            // 
             // prevSongLabel
             // 
-            prevSongLabel.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            prevSongLabel.Location = new Point(-4, 189);
+            prevSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            prevSongLabel.Location = new Point(6, 82);
             prevSongLabel.Name = "prevSongLabel";
-            prevSongLabel.Size = new Size(342, 124);
+            prevSongLabel.Size = new Size(342, 91);
             prevSongLabel.TabIndex = 2;
             prevSongLabel.Text = "Предыдущий:";
             prevSongLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // nextSongLabel
             // 
-            nextSongLabel.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            nextSongLabel.Location = new Point(420, 189);
+            nextSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            nextSongLabel.Location = new Point(423, 82);
             nextSongLabel.Name = "nextSongLabel";
-            nextSongLabel.Size = new Size(342, 121);
+            nextSongLabel.Size = new Size(342, 91);
             nextSongLabel.TabIndex = 1;
             nextSongLabel.Text = "Следующий:";
             nextSongLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
             // currentSongLabel
             // 
-            currentSongLabel.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            currentSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
             currentSongLabel.ForeColor = Color.Black;
-            currentSongLabel.Location = new Point(54, 38);
+            currentSongLabel.Location = new Point(54, 3);
             currentSongLabel.Name = "currentSongLabel";
-            currentSongLabel.Size = new Size(661, 151);
+            currentSongLabel.Size = new Size(661, 103);
             currentSongLabel.TabIndex = 0;
             currentSongLabel.Text = "Сейчас играет:";
             currentSongLabel.TextAlign = ContentAlignment.MiddleCenter;
@@ -239,12 +252,14 @@
             // 
             // deleteButton
             // 
-            deleteButton.Location = new Point(568, 257);
+            deleteButton.BackColor = Color.FromArgb(255, 128, 128);
+            deleteButton.Font = new Font("Segoe UI Semibold", 8F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            deleteButton.Location = new Point(568, 243);
             deleteButton.Name = "deleteButton";
-            deleteButton.Size = new Size(194, 29);
+            deleteButton.Size = new Size(194, 43);
             deleteButton.TabIndex = 2;
-            deleteButton.Text = "Удалить файл";
-            deleteButton.UseVisualStyleBackColor = true;
+            deleteButton.Text = "Удалить трек из плейлиста";
+            deleteButton.UseVisualStyleBackColor = false;
             deleteButton.Click += deleteButton_Click;
             // 
             // openFilesButton
@@ -259,6 +274,7 @@
             // 
             // filesListBox
             // 
+            filesListBox.AllowDrop = true;
             filesListBox.Font = new Font("Segoe UI Semibold", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 204);
             filesListBox.FormattingEnabled = true;
             filesListBox.ItemHeight = 23;
@@ -267,6 +283,11 @@
             filesListBox.Size = new Size(556, 280);
             filesListBox.TabIndex = 0;
             filesListBox.SelectedIndexChanged += filesListBox_SelectedIndexChanged;
+            filesListBox.DragDrop += filesListBox_DragDrop;
+            filesListBox.DragOver += filesListBox_DragOver;
+            filesListBox.MouseDown += filesListBox_MouseDown;
+            filesListBox.MouseMove += filesListBox_MouseMove;
+            filesListBox.MouseUp += filesListBox_MouseUp;
             // 
             // tabPage3
             // 
@@ -305,9 +326,9 @@
             // 
             // songBar
             // 
-            songBar.Location = new Point(-1, 360);
+            songBar.Location = new Point(-8, 360);
             songBar.Name = "songBar";
-            songBar.Size = new Size(795, 56);
+            songBar.Size = new Size(796, 56);
             songBar.TabIndex = 13;
             songBar.Scroll += songBar_Scroll;
             // 
@@ -351,6 +372,7 @@
             ((System.ComponentModel.ISupportInitialize)volumeBar).EndInit();
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)wavePictureBox).EndInit();
             tabPage2.ResumeLayout(false);
             tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)songBar).EndInit();
@@ -385,5 +407,6 @@
         private Label currentSongLabel;
         private Label prevSongLabel;
         private Label nextSongLabel;
+        private PictureBox wavePictureBox;
     }
 }

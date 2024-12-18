@@ -6,6 +6,9 @@ using WMPLib;
 using static AudioPlayerLib.AudioPlayer;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
+using NAudio.Wave;
+using System.Drawing;
+
 namespace AudioPlayer1
 {
     public partial class Form1 : Form
@@ -31,15 +34,6 @@ namespace AudioPlayer1
             volumeBar.Value = 25;
             volumeLabel.Text = volumeBar.Value.ToString();
             player.SetVolume(volumeBar.Value);
-        }
-
-        private void UpdatePlaylistDisplay()
-        {
-            filesListBox.Items.Clear();
-            foreach (var file in player.GetPlaylist())
-            {
-                filesListBox.Items.Add(Path.GetFileName(file));
-            }
         }
 
         private void UpdateTrackSelection()
@@ -104,33 +98,32 @@ namespace AudioPlayer1
             {
                 foreach (string file in ofd.FileNames)
                 {
-                    filesListBox.Items.Add(Path.GetFileName(file));
                     files.Add(file);
+                    string duration = player.GetTrackDuration(file);
+                    filesListBox.Items.Add($"{Path.GetFileName(file),-30}\t{duration}");
                     player.AddToPlaylist(file);
                 }
             }
         }
 
-        private void filesListBox_DoubleClick(object sender, EventArgs e)
-        {
-            int selectedIndex = filesListBox.SelectedIndex;
+        // Выбор трека в плейлисте
 
-            if (selectedIndex >= 0)
-            {
-                player.SelectTrack(selectedIndex);
-                UpdatePlaylistDisplay();
-            }
-        }
         private void filesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selectedIndex = filesListBox.SelectedIndex;
 
+            List<string> paths = player.GetPlaylistPaths();
+
             if (selectedIndex >= 0 && selectedIndex < files.Count)
             {
+                string selectedPath = paths[filesListBox.SelectedIndex];
                 player.SelectTrack(selectedIndex);
+                DrawWaveform(selectedPath, wavePictureBox);
                 player.Play();
             }
         }
+
+        // Проигрывание трека
 
         private void playButton_Click(object sender, EventArgs e)
         {
@@ -145,10 +138,14 @@ namespace AudioPlayer1
             }
         }
 
+        // Пауза
+
         private void pauseButton_Click(object sender, EventArgs e)
         {
             player.Pause();
         }
+
+        // Стоп
 
         private void stopButton_Click(object sender, EventArgs e)
         {
@@ -156,11 +153,15 @@ namespace AudioPlayer1
             ResetProgressBar();
         }
 
+        // Следующий трек
+
         private void skipButton_Click(object sender, EventArgs e)
         {
             player.Next();
             UpdateTrackSelection();
         }
+
+        // Предыдущий трек
 
         private void backButton_Click(object sender, EventArgs e)
         {
@@ -168,27 +169,36 @@ namespace AudioPlayer1
             UpdateTrackSelection();
         }
 
+        // Громкость трека
+
         private void volumeBar_Scroll(object sender, EventArgs e)
         {
             player.SetVolume(volumeBar.Value);
             volumeLabel.Text = volumeBar.Value.ToString();
         }
 
+        // Таймер для того, чтобы перемотка работала и обновлялся progressBar
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             songBar.Maximum = Convert.ToInt32(player.GetDuration());
             songBar.Value = Convert.ToInt32(player.GetCurrentPosition());
 
+            progressBar.Maximum = Convert.ToInt32(player.GetDuration());
+
             progressStartLabel.Text = player.GetCurrentPositionString();
             progressEndLabel.Text = player.GetDurationString().ToString();
 
-            progressBar.Maximum = Convert.ToInt32(player.GetDuration());
-
             if (player.isPlaying())
             {
-                progressBar.Value = (int)player.GetCurrentPosition();
+                progressBar.Value = songBar.Value;
             }
+
+            int trackPosition = (int)(player.GetCurrentPosition() / player.GetDuration() * wavePictureBox.Width);
+            wavePictureBox.Invalidate();
         }
+
+        // Обработчик изменения состояния плеера для работы таймера
 
         private void HandlePlayStateChanged(PlayerState state)
         {
@@ -207,10 +217,15 @@ namespace AudioPlayer1
             }
         }
 
+        // Перемотка трека
+
         private void songBar_Scroll(object sender, EventArgs e)
         {
             player.SetCurrentPosition(songBar.Value);
+            progressBar.Value = songBar.Value;
         }
+
+        // Удаление трека из плейлиста
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
@@ -228,6 +243,8 @@ namespace AudioPlayer1
                 }
             }
         }
+
+        // Перемешивание плейлиста
 
         private void shuffleButton_Click(object sender, EventArgs e)
         {
@@ -247,6 +264,121 @@ namespace AudioPlayer1
             {
                 MessageBox.Show("Для перемешивания должно быть хотя бы два файла в плейлисте.",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // Перетаскивание мышкой треков в плейлисте
+        // 
+        private int dragIndex = -1;
+        private bool isDragging = false;
+
+        private void filesListBox_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void filesListBox_DragDrop(object sender, DragEventArgs e)
+        {
+            Point point = filesListBox.PointToClient(new Point(e.X, e.Y));
+            int dropIndex = filesListBox.IndexFromPoint(point);
+
+            if (dropIndex < 0) dropIndex = filesListBox.Items.Count - 1;
+
+            if (dragIndex >= 0 && dragIndex != dropIndex)
+            {
+                var item = filesListBox.Items[dragIndex];
+                filesListBox.Items.RemoveAt(dragIndex);
+                filesListBox.Items.Insert(dropIndex, item);
+
+                var track = files[dragIndex];
+                files.RemoveAt(dragIndex);
+                files.Insert(dropIndex, track);
+
+                player.MoveTrack(dragIndex, dropIndex);
+
+                filesListBox.SelectedIndex = dropIndex;
+            }
+        }
+
+        private void filesListBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            dragIndex = filesListBox.IndexFromPoint(e.Location);
+            isDragging = false;
+        }
+
+        private void filesListBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && dragIndex >= 0)
+            {
+                isDragging = true;
+                filesListBox.DoDragDrop(filesListBox.Items[dragIndex], DragDropEffects.Move);
+            }
+        }
+
+        private void filesListBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (!isDragging && dragIndex >= 0)
+            {
+                filesListBox.SelectedIndex = dragIndex;
+
+                player.SelectTrack(dragIndex);
+                player.Play();
+            }
+
+            dragIndex = -1;
+        }
+
+        // Реализация звуковой дорожки
+        private void DrawWaveform(string filePath, PictureBox waveformBox)
+        {
+            waveformBox.Image = null;
+            try
+            {
+                using var reader = new AudioFileReader(filePath);
+
+                int width = waveformBox.Width;
+                int height = waveformBox.Height;
+
+                var samplesPerPixel = (int)(reader.Length / reader.WaveFormat.BlockAlign / width);
+
+                // Считаем амплитуды для левого канала
+                var amplitudes = new List<float>();
+                float[] buffer = new float[samplesPerPixel];
+                int bytesRead;
+
+                while ((bytesRead = reader.Read(buffer, 0, samplesPerPixel)) > 0)
+                {
+                    float maxAmplitude = buffer.Take(bytesRead).Max(Math.Abs);
+                    amplitudes.Add(maxAmplitude);
+                }
+
+                int count = amplitudes.Count;
+                float scaleX = (float)width / count; // Коэффициент масштабирования по X
+                float scaleY = height / 2f;
+
+                var bitmap = new Bitmap(width, height);
+
+                using (var g = Graphics.FromImage(bitmap))
+                {
+                    g.Clear(Color.White);
+
+                    var pen = new Pen(Color.BlueViolet, 1);
+
+                    for (int x = 0; x < width && x < count; x++)
+                    {
+                        float amplitude = amplitudes[x];
+                        float y = scaleY - (amplitude * scaleY); // Верхняя точка
+                        float y2 = scaleY + (amplitude * scaleY); // Нижняя точка
+
+                        g.DrawLine(pen, x, y, x, y2);
+                    }
+                }
+
+                waveformBox.Image = bitmap;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при отрисовке waveform: {ex.Message}");
             }
         }
     }

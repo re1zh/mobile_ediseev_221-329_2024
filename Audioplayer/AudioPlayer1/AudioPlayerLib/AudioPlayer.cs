@@ -58,6 +58,7 @@ namespace AudioPlayerLib
             wmp.PlayStateChange += OnPlayStateChange;
         }
 
+        public List<string> GetPlaylistPaths() => new List<string>(playlistPaths);
         public List<string> GetPlaylist() => new List<string>(safeFileNames);
         public int GetCurrentTrackIndex() => currentTrackIndex;
 
@@ -85,6 +86,25 @@ namespace AudioPlayerLib
         public string GetDurationString()
         {
             return wmp.controls.currentItem.durationString;
+        }
+        public string GetTrackDuration(string filePath)
+        {
+            try
+            {
+                WindowsMediaPlayer tempPlayer = new WindowsMediaPlayer();
+                IWMPMedia media = tempPlayer.newMedia(filePath);
+
+                double durationInSeconds = media.duration;
+
+                int minutes = (int)(durationInSeconds / 60);
+                int seconds = (int)(durationInSeconds % 60);
+
+                return $"{minutes:D2}:{seconds:D2}";
+            }
+            catch (Exception)
+            {
+                return "00:00";
+            }
         }
         public bool isPlaying()
         {
@@ -246,7 +266,35 @@ namespace AudioPlayerLib
             for (int i = 0; i < playlistPaths.Count; i++)
             {
                 string prefix = i == currentTrackIndex ? "-> " : "   ";
-                Console.WriteLine($"{prefix}{i + 1}. {safeFileNames[i]}");
+                Console.WriteLine($"{prefix}{i + 1}. {safeFileNames[i], -30}\t{GetTrackDuration(playlistPaths[i])}");
+            }
+        }
+
+        public void MoveTrack(int oldIndex, int newIndex)
+        {
+            if (oldIndex >= 0 && oldIndex < playlistPaths.Count && newIndex >= 0 && newIndex < playlistPaths.Count)
+            {
+                var tempPath = playlistPaths[oldIndex];
+                var tempFileName = safeFileNames[oldIndex];
+
+                playlistPaths.RemoveAt(oldIndex);
+                safeFileNames.RemoveAt(oldIndex);
+
+                playlistPaths.Insert(newIndex, tempPath);
+                safeFileNames.Insert(newIndex, tempFileName);
+
+                if (currentTrackIndex == oldIndex)
+                {
+                    currentTrackIndex = newIndex; // Обновляем текущий трек
+                }
+                else if (oldIndex < currentTrackIndex && newIndex >= currentTrackIndex)
+                {
+                    currentTrackIndex--; // Корректируем индекс текущего трека
+                }
+                else if (oldIndex > currentTrackIndex && newIndex <= currentTrackIndex)
+                {
+                    currentTrackIndex++;
+                }
             }
         }
     }
