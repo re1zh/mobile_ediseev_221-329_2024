@@ -23,6 +23,7 @@ namespace AudioPlayerApp
         static void Main(string[] args)
         {
             AudioPlayer player = new AudioPlayer();
+            bool isAscending = true;
 
             while (true)
             {
@@ -35,10 +36,15 @@ namespace AudioPlayerApp
                 Console.WriteLine("6 - След. трек");
                 Console.WriteLine("7 - Пред. трек");
                 Console.WriteLine("8 - Перемешать");
-                Console.WriteLine("9 - Вывести плейлист");
-                Console.WriteLine("10 - Выбрать трек");
-                Console.WriteLine("11 - Установить громкость");
-                Console.WriteLine("12 - Перемотка трека");
+                Console.WriteLine("9 - Сортировать по алфавиту");
+                Console.WriteLine("10 - Сортировать по длине трека");
+                Console.WriteLine("11 - Выбрать трек");
+                Console.WriteLine("12 - Установить громкость");
+                Console.WriteLine("13 - Перемотка трека");
+                Console.WriteLine("14 - Сохранить плейлист");
+                Console.WriteLine("15 - Загрузить плейлист");
+                Console.WriteLine("16 - Экспорт плейлиста");
+                Console.WriteLine("17 - Вывести плейлист");
                 Console.WriteLine("0 - Выход");
 
                 Console.Write("\nВведите команду: ");
@@ -81,9 +87,19 @@ namespace AudioPlayerApp
                         player.Shuffle();
                         break;
                     case "9":
-                        player.PrintPlaylist();
+                        player.SortAlphabet(isAscending);
+                        if (isAscending)
+                        {
+                            isAscending = false;
+                        }
+                        else
+                        {
+                            isAscending = true;
+                        }
                         break;
                     case "10":
+                        break;
+                    case "11":
                         Console.Write("Введите номер трека для выбора: ");
                         if (int.TryParse(Console.ReadLine(), out int selectIndex))
                         {
@@ -94,7 +110,7 @@ namespace AudioPlayerApp
                             Console.WriteLine("Ошибка.");
                         }
                         break;
-                    case "11":
+                    case "12":
                         Console.Write("Введите уровень громкости (0-100): ");
                         if (int.TryParse(Console.ReadLine(), out int volume) && volume >= 0 && volume <= 100)
                         {
@@ -106,7 +122,7 @@ namespace AudioPlayerApp
                             Console.WriteLine("Некорректное значение громкости. Введите число от 0 до 100.");
                         }
                         break;
-                    case "12":
+                    case "13":
                         double duration = player.GetDuration();
                         int min = (int)duration / 60;
                         int sec = (int)duration % 60;
@@ -124,7 +140,15 @@ namespace AudioPlayerApp
                         {
                             Console.WriteLine("Ошибка. Неверный формат или превышено время трека.");
                         }
-
+                        break;
+                    case "14":
+                        break;
+                    case "15":
+                        break;
+                    case "16":
+                        break;
+                    case "17":
+                        player.PrintPlaylist();
                         break;
                     case "0":
                         return;

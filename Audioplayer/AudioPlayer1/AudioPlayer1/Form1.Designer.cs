@@ -47,6 +47,8 @@
             nextSongLabel = new Label();
             currentSongLabel = new Label();
             tabPage2 = new TabPage();
+            sortDurButton = new Button();
+            sortButton = new Button();
             deleteButton = new Button();
             openFilesButton = new Button();
             filesListBox = new ListBox();
@@ -70,7 +72,7 @@
             playButton.BackColor = SystemColors.Window;
             playButton.BackgroundImage = Properties.Resources.play;
             playButton.BackgroundImageLayout = ImageLayout.Stretch;
-            playButton.Location = new Point(198, 406);
+            playButton.Location = new Point(195, 408);
             playButton.Name = "playButton";
             playButton.Size = new Size(45, 45);
             playButton.TabIndex = 0;
@@ -82,7 +84,7 @@
             pauseButton.BackColor = SystemColors.Window;
             pauseButton.BackgroundImage = Properties.Resources.pause;
             pauseButton.BackgroundImageLayout = ImageLayout.Stretch;
-            pauseButton.Location = new Point(246, 406);
+            pauseButton.Location = new Point(246, 408);
             pauseButton.Name = "pauseButton";
             pauseButton.Size = new Size(45, 45);
             pauseButton.TabIndex = 1;
@@ -94,7 +96,7 @@
             stopButton.BackColor = SystemColors.Window;
             stopButton.BackgroundImage = (Image)resources.GetObject("stopButton.BackgroundImage");
             stopButton.BackgroundImageLayout = ImageLayout.Stretch;
-            stopButton.Location = new Point(294, 406);
+            stopButton.Location = new Point(297, 408);
             stopButton.Name = "stopButton";
             stopButton.Size = new Size(45, 45);
             stopButton.TabIndex = 2;
@@ -106,7 +108,7 @@
             skipButton.BackColor = SystemColors.Window;
             skipButton.BackgroundImage = (Image)resources.GetObject("skipButton.BackgroundImage");
             skipButton.BackgroundImageLayout = ImageLayout.Stretch;
-            skipButton.Location = new Point(354, 406);
+            skipButton.Location = new Point(361, 408);
             skipButton.Name = "skipButton";
             skipButton.Size = new Size(45, 45);
             skipButton.TabIndex = 3;
@@ -118,7 +120,7 @@
             backButton.BackColor = SystemColors.Window;
             backButton.BackgroundImage = (Image)resources.GetObject("backButton.BackgroundImage");
             backButton.BackgroundImageLayout = ImageLayout.Stretch;
-            backButton.Location = new Point(134, 406);
+            backButton.Location = new Point(134, 408);
             backButton.Name = "backButton";
             backButton.Size = new Size(45, 45);
             backButton.TabIndex = 4;
@@ -127,17 +129,17 @@
             // 
             // progressBar
             // 
-            progressBar.Location = new Point(12, 384);
+            progressBar.Location = new Point(13, 390);
             progressBar.MarqueeAnimationSpeed = 0;
             progressBar.Name = "progressBar";
-            progressBar.Size = new Size(776, 10);
+            progressBar.Size = new Size(775, 10);
             progressBar.TabIndex = 5;
             // 
             // progressStartLabel
             // 
             progressStartLabel.AutoSize = true;
             progressStartLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            progressStartLabel.Location = new Point(12, 400);
+            progressStartLabel.Location = new Point(12, 403);
             progressStartLabel.Name = "progressStartLabel";
             progressStartLabel.Size = new Size(61, 28);
             progressStartLabel.TabIndex = 6;
@@ -147,7 +149,7 @@
             // 
             progressEndLabel.AutoSize = true;
             progressEndLabel.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            progressEndLabel.Location = new Point(727, 400);
+            progressEndLabel.Location = new Point(727, 403);
             progressEndLabel.Name = "progressEndLabel";
             progressEndLabel.Size = new Size(61, 28);
             progressEndLabel.TabIndex = 7;
@@ -155,7 +157,7 @@
             // 
             // volumeBar
             // 
-            volumeBar.Location = new Point(559, 406);
+            volumeBar.Location = new Point(559, 408);
             volumeBar.Maximum = 100;
             volumeBar.Name = "volumeBar";
             volumeBar.Size = new Size(162, 56);
@@ -200,46 +202,48 @@
             // 
             // wavePictureBox
             // 
-            wavePictureBox.Location = new Point(-4, 253);
+            wavePictureBox.Location = new Point(-4, 228);
             wavePictureBox.Name = "wavePictureBox";
-            wavePictureBox.Size = new Size(776, 60);
+            wavePictureBox.Size = new Size(776, 85);
             wavePictureBox.TabIndex = 3;
             wavePictureBox.TabStop = false;
             // 
             // prevSongLabel
             // 
             prevSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            prevSongLabel.Location = new Point(6, 82);
+            prevSongLabel.Location = new Point(6, 107);
             prevSongLabel.Name = "prevSongLabel";
             prevSongLabel.Size = new Size(342, 91);
             prevSongLabel.TabIndex = 2;
             prevSongLabel.Text = "Предыдущий:";
-            prevSongLabel.TextAlign = ContentAlignment.MiddleCenter;
+            prevSongLabel.TextAlign = ContentAlignment.TopCenter;
             // 
             // nextSongLabel
             // 
             nextSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            nextSongLabel.Location = new Point(423, 82);
+            nextSongLabel.Location = new Point(423, 107);
             nextSongLabel.Name = "nextSongLabel";
             nextSongLabel.Size = new Size(342, 91);
             nextSongLabel.TabIndex = 1;
             nextSongLabel.Text = "Следующий:";
-            nextSongLabel.TextAlign = ContentAlignment.MiddleCenter;
+            nextSongLabel.TextAlign = ContentAlignment.TopCenter;
             // 
             // currentSongLabel
             // 
             currentSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
             currentSongLabel.ForeColor = Color.Black;
-            currentSongLabel.Location = new Point(54, 3);
+            currentSongLabel.Location = new Point(54, 17);
             currentSongLabel.Name = "currentSongLabel";
             currentSongLabel.Size = new Size(661, 103);
             currentSongLabel.TabIndex = 0;
             currentSongLabel.Text = "Сейчас играет:";
-            currentSongLabel.TextAlign = ContentAlignment.MiddleCenter;
+            currentSongLabel.TextAlign = ContentAlignment.TopCenter;
             // 
             // tabPage2
             // 
             tabPage2.BackColor = Color.PaleTurquoise;
+            tabPage2.Controls.Add(sortDurButton);
+            tabPage2.Controls.Add(sortButton);
             tabPage2.Controls.Add(deleteButton);
             tabPage2.Controls.Add(openFilesButton);
             tabPage2.Controls.Add(filesListBox);
@@ -250,26 +254,47 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Плейлист";
             // 
+            // sortDurButton
+            // 
+            sortDurButton.Location = new Point(196, 238);
+            sortDurButton.Name = "sortDurButton";
+            sortDurButton.Size = new Size(194, 48);
+            sortDurButton.TabIndex = 4;
+            sortDurButton.Text = "Сортировать по длительности";
+            sortDurButton.UseVisualStyleBackColor = true;
+            // 
+            // sortButton
+            // 
+            sortButton.Location = new Point(6, 238);
+            sortButton.Name = "sortButton";
+            sortButton.Size = new Size(194, 48);
+            sortButton.TabIndex = 3;
+            sortButton.Text = "Сортировать по алфавиту";
+            sortButton.UseVisualStyleBackColor = true;
+            sortButton.Click += sortButton_Click;
+            // 
             // deleteButton
             // 
             deleteButton.BackColor = Color.FromArgb(255, 128, 128);
-            deleteButton.Font = new Font("Segoe UI Semibold", 8F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            deleteButton.Location = new Point(568, 243);
+            deleteButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            deleteButton.Location = new Point(580, 6);
             deleteButton.Name = "deleteButton";
-            deleteButton.Size = new Size(194, 43);
+            deleteButton.Size = new Size(182, 43);
             deleteButton.TabIndex = 2;
-            deleteButton.Text = "Удалить трек из плейлиста";
+            deleteButton.Text = "Удалить трек";
             deleteButton.UseVisualStyleBackColor = false;
             deleteButton.Click += deleteButton_Click;
             // 
             // openFilesButton
             // 
-            openFilesButton.Location = new Point(568, 6);
+            openFilesButton.BackColor = Color.Lime;
+            openFilesButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            openFilesButton.Location = new Point(396, 6);
             openFilesButton.Name = "openFilesButton";
-            openFilesButton.Size = new Size(194, 29);
+            openFilesButton.Size = new Size(185, 43);
             openFilesButton.TabIndex = 1;
-            openFilesButton.Text = "Открыть файлы";
-            openFilesButton.UseVisualStyleBackColor = true;
+            openFilesButton.Text = "Добавить треки";
+            openFilesButton.UseVisualStyleBackColor = false;
             openFilesButton.Click += openFilesButton_Click;
             // 
             // filesListBox
@@ -280,7 +305,7 @@
             filesListBox.ItemHeight = 23;
             filesListBox.Location = new Point(6, 6);
             filesListBox.Name = "filesListBox";
-            filesListBox.Size = new Size(556, 280);
+            filesListBox.Size = new Size(384, 280);
             filesListBox.TabIndex = 0;
             filesListBox.SelectedIndexChanged += filesListBox_SelectedIndexChanged;
             filesListBox.DragDrop += filesListBox_DragDrop;
@@ -326,9 +351,9 @@
             // 
             // songBar
             // 
-            songBar.Location = new Point(-8, 360);
+            songBar.Location = new Point(-2, 360);
             songBar.Name = "songBar";
-            songBar.Size = new Size(796, 56);
+            songBar.Size = new Size(800, 56);
             songBar.TabIndex = 13;
             songBar.Scroll += songBar_Scroll;
             // 
@@ -337,7 +362,7 @@
             shuffleButton.BackColor = SystemColors.Window;
             shuffleButton.BackgroundImage = (Image)resources.GetObject("shuffleButton.BackgroundImage");
             shuffleButton.BackgroundImageLayout = ImageLayout.Stretch;
-            shuffleButton.Location = new Point(463, 406);
+            shuffleButton.Location = new Point(463, 408);
             shuffleButton.Name = "shuffleButton";
             shuffleButton.Size = new Size(45, 45);
             shuffleButton.TabIndex = 14;
@@ -408,5 +433,8 @@
         private Label prevSongLabel;
         private Label nextSongLabel;
         private PictureBox wavePictureBox;
+        private Button sortButton;
+        private Button button2;
+        private Button sortDurButton;
     }
 }

@@ -254,6 +254,49 @@ namespace AudioPlayerLib
             }
         }
 
+        public void SortAlphabet(bool isAscending)
+        {
+            if (isAscending)
+            {
+                var sortedPlaylist = safeFileNames
+                    .Zip(playlistPaths, (name, path) => new { Name = name, Path = path })
+                    .OrderBy(track => track.Name)
+                    .ToList();
+
+                safeFileNames.Clear();
+                playlistPaths.Clear();
+
+                foreach (var track in sortedPlaylist)
+                {
+                    safeFileNames.Add(track.Name);
+                    playlistPaths.Add(track.Path);
+                }
+            }
+            else
+            {
+                var sortedPlaylist = safeFileNames
+                    .Zip(playlistPaths, (name, path) => new { Name = name, Path = path })
+                    .OrderByDescending(track => track.Name)
+                    .ToList();
+
+                safeFileNames.Clear();
+                playlistPaths.Clear();
+
+                foreach (var track in sortedPlaylist)
+                {
+                    safeFileNames.Add(track.Name);
+                    playlistPaths.Add(track.Path);
+                }
+            }
+
+            currentTrackIndex = 0;
+            if (playlistPaths.Count > 0)
+            {
+                wmp.URL = playlistPaths[currentTrackIndex];
+                Play();
+            }
+        }
+
         public void PrintPlaylist()
         {
             if (playlistPaths.Count == 0)
@@ -285,11 +328,11 @@ namespace AudioPlayerLib
 
                 if (currentTrackIndex == oldIndex)
                 {
-                    currentTrackIndex = newIndex; // Обновляем текущий трек
+                    currentTrackIndex = newIndex;
                 }
                 else if (oldIndex < currentTrackIndex && newIndex >= currentTrackIndex)
                 {
-                    currentTrackIndex--; // Корректируем индекс текущего трека
+                    currentTrackIndex--;
                 }
                 else if (oldIndex > currentTrackIndex && newIndex <= currentTrackIndex)
                 {

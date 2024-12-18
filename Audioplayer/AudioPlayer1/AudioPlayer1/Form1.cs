@@ -36,6 +36,7 @@ namespace AudioPlayer1
             player.SetVolume(volumeBar.Value);
         }
 
+        // Выделение трека в ListBox
         private void UpdateTrackSelection()
         {
             int currentIndex = player.GetCurrentTrackIndex();
@@ -45,6 +46,7 @@ namespace AudioPlayer1
             }
         }
 
+        // Обновление текущего, след. и пред. треков
         private void UpdateLabels()
         {
             int currentIndex = player.GetCurrentTrackIndex();
@@ -67,12 +69,14 @@ namespace AudioPlayer1
             nextSongLabel.Text = $"Следующий: {playlist[nextIndex]}";
         }
 
+        // Обновление progressBar
         private void UpdateProgressBar()
         {
             songBar.Maximum = (int)player.GetDuration();
             songBar.Value = (int)player.GetCurrentPosition();
         }
 
+        // Очистка progressBar и progressLabel
         private void ResetProgressBar()
         {
             songBar.Value = 0;
@@ -81,6 +85,7 @@ namespace AudioPlayer1
             progressEndLabel.Text = "00:00";
         }
 
+        // Обновление выбранного элемента при смене трека
         private void UpdateFilesListBoxSelection(int trackIndex)
         {
             if (trackIndex >= 0 && trackIndex < filesListBox.Items.Count)
@@ -89,10 +94,12 @@ namespace AudioPlayer1
             }
         }
 
+        // Открытие треков
         private void openFilesButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = true;
+            ofd.Title = "Выберите аудиофайлы";
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -107,7 +114,6 @@ namespace AudioPlayer1
         }
 
         // Выбор трека в плейлисте
-
         private void filesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selectedIndex = filesListBox.SelectedIndex;
@@ -124,7 +130,6 @@ namespace AudioPlayer1
         }
 
         // Проигрывание трека
-
         private void playButton_Click(object sender, EventArgs e)
         {
             if (files.Count > 0 && filesListBox.SelectedIndex >= 0)
@@ -139,14 +144,12 @@ namespace AudioPlayer1
         }
 
         // Пауза
-
         private void pauseButton_Click(object sender, EventArgs e)
         {
             player.Pause();
         }
 
         // Стоп
-
         private void stopButton_Click(object sender, EventArgs e)
         {
             player.Stop();
@@ -154,7 +157,6 @@ namespace AudioPlayer1
         }
 
         // Следующий трек
-
         private void skipButton_Click(object sender, EventArgs e)
         {
             player.Next();
@@ -162,7 +164,6 @@ namespace AudioPlayer1
         }
 
         // Предыдущий трек
-
         private void backButton_Click(object sender, EventArgs e)
         {
             player.Previous();
@@ -170,15 +171,13 @@ namespace AudioPlayer1
         }
 
         // Громкость трека
-
         private void volumeBar_Scroll(object sender, EventArgs e)
         {
             player.SetVolume(volumeBar.Value);
             volumeLabel.Text = volumeBar.Value.ToString();
         }
 
-        // Таймер для того, чтобы перемотка работала и обновлялся progressBar
-
+        // Таймер для того, чтобы работала перемотка и обновлялся progressBar
         private void timer1_Tick(object sender, EventArgs e)
         {
             songBar.Maximum = Convert.ToInt32(player.GetDuration());
@@ -199,7 +198,6 @@ namespace AudioPlayer1
         }
 
         // Обработчик изменения состояния плеера для работы таймера
-
         private void HandlePlayStateChanged(PlayerState state)
         {
             switch (state)
@@ -218,7 +216,6 @@ namespace AudioPlayer1
         }
 
         // Перемотка трека
-
         private void songBar_Scroll(object sender, EventArgs e)
         {
             player.SetCurrentPosition(songBar.Value);
@@ -226,7 +223,6 @@ namespace AudioPlayer1
         }
 
         // Удаление трека из плейлиста
-
         private void deleteButton_Click(object sender, EventArgs e)
         {
             int selectedIndex = filesListBox.SelectedIndex;
@@ -245,7 +241,6 @@ namespace AudioPlayer1
         }
 
         // Перемешивание плейлиста
-
         private void shuffleButton_Click(object sender, EventArgs e)
         {
             if (filesListBox.Items.Count > 1)
@@ -268,15 +263,12 @@ namespace AudioPlayer1
         }
 
         // Перетаскивание мышкой треков в плейлисте
-        // 
         private int dragIndex = -1;
         private bool isDragging = false;
-
         private void filesListBox_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Move;
         }
-
         private void filesListBox_DragDrop(object sender, DragEventArgs e)
         {
             Point point = filesListBox.PointToClient(new Point(e.X, e.Y));
@@ -299,13 +291,11 @@ namespace AudioPlayer1
                 filesListBox.SelectedIndex = dropIndex;
             }
         }
-
         private void filesListBox_MouseDown(object sender, MouseEventArgs e)
         {
             dragIndex = filesListBox.IndexFromPoint(e.Location);
             isDragging = false;
         }
-
         private void filesListBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && dragIndex >= 0)
@@ -314,7 +304,6 @@ namespace AudioPlayer1
                 filesListBox.DoDragDrop(filesListBox.Items[dragIndex], DragDropEffects.Move);
             }
         }
-
         private void filesListBox_MouseUp(object sender, MouseEventArgs e)
         {
             if (!isDragging && dragIndex >= 0)
@@ -341,7 +330,6 @@ namespace AudioPlayer1
 
                 var samplesPerPixel = (int)(reader.Length / reader.WaveFormat.BlockAlign / width);
 
-                // Считаем амплитуды для левого канала
                 var amplitudes = new List<float>();
                 float[] buffer = new float[samplesPerPixel];
                 int bytesRead;
@@ -353,7 +341,7 @@ namespace AudioPlayer1
                 }
 
                 int count = amplitudes.Count;
-                float scaleX = (float)width / count; // Коэффициент масштабирования по X
+                float scaleX = (float)width / count;
                 float scaleY = height / 2f;
 
                 var bitmap = new Bitmap(width, height);
@@ -367,8 +355,8 @@ namespace AudioPlayer1
                     for (int x = 0; x < width && x < count; x++)
                     {
                         float amplitude = amplitudes[x];
-                        float y = scaleY - (amplitude * scaleY); // Верхняя точка
-                        float y2 = scaleY + (amplitude * scaleY); // Нижняя точка
+                        float y = scaleY - (amplitude * scaleY);
+                        float y2 = scaleY + (amplitude * scaleY);
 
                         g.DrawLine(pen, x, y, x, y2);
                     }
@@ -379,6 +367,38 @@ namespace AudioPlayer1
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при отрисовке waveform: {ex.Message}");
+            }
+        }
+
+        // Сортировка по а
+        private bool isAscendingSort = true;
+        private void sortButton_Click(object sender, EventArgs e)
+        {
+            if (filesListBox.Items.Count > 1)
+            {
+                player.SortAlphabet(isAscendingSort);
+
+                filesListBox.Items.Clear();
+                filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
+
+                if (filesListBox.Items.Count > 0)
+                {
+                    filesListBox.SelectedIndex = 0;
+                }
+
+                if (isAscendingSort)
+                {
+                    isAscendingSort = false;
+                }
+                else
+                {
+                    isAscendingSort = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Для сортировки должно быть хотя бы два файла в плейлисте.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
     }
