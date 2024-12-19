@@ -411,5 +411,40 @@ namespace AudioPlayerLib
                 }
             }
         }
+
+        public void SavePlaylist(string filePath)
+        {
+            try
+            {
+                System.IO.File.WriteAllLines(filePath, playlistPaths);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при сохранении плейлиста: {ex.Message}");
+            }
+        }
+
+        public void LoadPlaylist(string filePath)
+        {
+            try
+            {
+                var loadedPaths = System.IO.File.ReadAllLines(filePath).ToList();
+                playlistPaths.Clear();
+                safeFileNames.Clear();
+
+                foreach (var path in loadedPaths)
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        playlistPaths.Add(path);
+                        safeFileNames.Add(System.IO.Path.GetFileName(path));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке плейлиста: {ex.Message}");
+            }
+        }
     }
 }

@@ -142,8 +142,36 @@ namespace AudioPlayerApp
                         }
                         break;
                     case "14":
+                        Console.Write("Введите имя файла для сохранения (например, playlist.txt): ");
+                        string filePath = Console.ReadLine();
+
+                        try
+                        {
+                            player.SavePlaylist(filePath);
+                            Console.WriteLine("Плейлист успешно сохранен.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Ошибка при сохранении: {ex.Message}");
+                        }
+                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
                         break;
                     case "15":
+                        Console.Write("Введите имя файла для загрузки (например, playlist.txt): ");
+                        string filePath_ = Console.ReadLine();
+
+                        try
+                        {
+                            player.LoadPlaylist(filePath_);
+                            Console.WriteLine("Плейлист успешно загружен.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Ошибка при загрузке: {ex.Message}");
+                        }
+                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
                         break;
                     case "16":
                         break;

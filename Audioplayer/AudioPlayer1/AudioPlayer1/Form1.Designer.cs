@@ -60,7 +60,9 @@
             timer1 = new System.Windows.Forms.Timer(components);
             songBar = new TrackBar();
             shuffleButton = new Button();
-            fastForwardButton = new Button();
+            saveButton = new Button();
+            openPlaylistButton = new Button();
+            exportButton = new Button();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -207,6 +209,7 @@
             // 
             // comboBox1
             // 
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.FormattingEnabled = true;
             comboBox1.Location = new Point(671, 25);
             comboBox1.Name = "comboBox1";
@@ -216,7 +219,8 @@
             // 
             // wavePictureBox
             // 
-            wavePictureBox.Location = new Point(-4, 228);
+            wavePictureBox.BackColor = Color.MintCream;
+            wavePictureBox.Location = new Point(-3, 232);
             wavePictureBox.Name = "wavePictureBox";
             wavePictureBox.Size = new Size(776, 85);
             wavePictureBox.TabIndex = 3;
@@ -267,6 +271,9 @@
             // tabPage2
             // 
             tabPage2.BackColor = Color.PaleTurquoise;
+            tabPage2.Controls.Add(exportButton);
+            tabPage2.Controls.Add(openPlaylistButton);
+            tabPage2.Controls.Add(saveButton);
             tabPage2.Controls.Add(sortDurButton);
             tabPage2.Controls.Add(sortButton);
             tabPage2.Controls.Add(deleteButton);
@@ -388,23 +395,47 @@
             shuffleButton.BackColor = SystemColors.Window;
             shuffleButton.BackgroundImage = (Image)resources.GetObject("shuffleButton.BackgroundImage");
             shuffleButton.BackgroundImageLayout = ImageLayout.Stretch;
-            shuffleButton.Location = new Point(499, 408);
+            shuffleButton.Location = new Point(466, 408);
             shuffleButton.Name = "shuffleButton";
             shuffleButton.Size = new Size(45, 45);
             shuffleButton.TabIndex = 14;
             shuffleButton.UseVisualStyleBackColor = false;
             shuffleButton.Click += shuffleButton_Click;
             // 
-            // fastForwardButton
+            // saveButton
             // 
-            fastForwardButton.BackColor = SystemColors.Window;
-            fastForwardButton.BackgroundImage = (Image)resources.GetObject("fastForwardButton.BackgroundImage");
-            fastForwardButton.BackgroundImageLayout = ImageLayout.Stretch;
-            fastForwardButton.Location = new Point(412, 408);
-            fastForwardButton.Name = "fastForwardButton";
-            fastForwardButton.Size = new Size(45, 45);
-            fastForwardButton.TabIndex = 15;
-            fastForwardButton.UseVisualStyleBackColor = false;
+            saveButton.BackColor = Color.FromArgb(224, 224, 224);
+            saveButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            saveButton.Location = new Point(396, 189);
+            saveButton.Name = "saveButton";
+            saveButton.Size = new Size(185, 43);
+            saveButton.TabIndex = 5;
+            saveButton.Text = "Сохранить плейлист";
+            saveButton.UseVisualStyleBackColor = false;
+            saveButton.Click += saveButton_Click;
+            // 
+            // openPlaylistButton
+            // 
+            openPlaylistButton.BackColor = Color.FromArgb(224, 224, 224);
+            openPlaylistButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            openPlaylistButton.Location = new Point(580, 189);
+            openPlaylistButton.Name = "openPlaylistButton";
+            openPlaylistButton.Size = new Size(185, 43);
+            openPlaylistButton.TabIndex = 6;
+            openPlaylistButton.Text = "Открыть плейлист";
+            openPlaylistButton.UseVisualStyleBackColor = false;
+            openPlaylistButton.Click += openPlaylistButton_Click;
+            // 
+            // exportButton
+            // 
+            exportButton.BackColor = Color.FromArgb(255, 192, 255);
+            exportButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            exportButton.Location = new Point(494, 238);
+            exportButton.Name = "exportButton";
+            exportButton.Size = new Size(185, 43);
+            exportButton.TabIndex = 7;
+            exportButton.Text = "Экспорт плейлиста";
+            exportButton.UseVisualStyleBackColor = false;
             // 
             // Form1
             // 
@@ -412,7 +443,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.InactiveCaption;
             ClientSize = new Size(798, 465);
-            Controls.Add(fastForwardButton);
             Controls.Add(shuffleButton);
             Controls.Add(labelPerc);
             Controls.Add(tabControl1);
@@ -474,8 +504,10 @@
         private Button sortButton;
         private Button button2;
         private Button sortDurButton;
-        private Button fastForwardButton;
         private ComboBox comboBox1;
         private Label speedLabel;
+        private Button exportButton;
+        private Button openPlaylistButton;
+        private Button saveButton;
     }
 }

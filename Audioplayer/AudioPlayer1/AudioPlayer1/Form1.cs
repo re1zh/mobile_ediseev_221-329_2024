@@ -502,5 +502,38 @@ namespace AudioPlayer1
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+                saveFileDialog.DefaultExt = "txt";
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    player.SavePlaylist(saveFileDialog.FileName);
+                    MessageBox.Show("Плейлист успешно сохранен!", "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        private void openPlaylistButton_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    player.LoadPlaylist(openFileDialog.FileName);
+
+                    filesListBox.Items.Clear();
+                    filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
+
+                    MessageBox.Show("Плейлист успешно загружен!", "Загрузка", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
     }
 }
