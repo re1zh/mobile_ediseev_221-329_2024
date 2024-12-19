@@ -8,6 +8,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 using NAudio.Wave;
 using System.Drawing;
+using System;
 
 namespace AudioPlayer1
 {
@@ -34,6 +35,8 @@ namespace AudioPlayer1
             volumeBar.Value = 25;
             volumeLabel.Text = volumeBar.Value.ToString();
             player.SetVolume(volumeBar.Value);
+            comboBox1.Items.AddRange(new string[] { "0.5", "0.75", "1.0", "1.25", "1.5", "1.75", "2.0" });
+            comboBox1.SelectedIndex = 2;
         }
 
         // Выделение трека в ListBox
@@ -124,7 +127,10 @@ namespace AudioPlayer1
             {
                 string selectedPath = paths[filesListBox.SelectedIndex];
                 player.SelectTrack(selectedIndex);
+
                 DrawWaveform(selectedPath, wavePictureBox);
+                //UpdateWaveProgress(wavePictureBox, 0);
+
                 player.Play();
             }
         }
@@ -193,8 +199,7 @@ namespace AudioPlayer1
                 progressBar.Value = songBar.Value;
             }
 
-            int trackPosition = (int)(player.GetCurrentPosition() / player.GetDuration() * wavePictureBox.Width);
-            wavePictureBox.Invalidate();
+            //UpdateWaveProgress(wavePictureBox, songBar.Value);
         }
 
         // Обработчик изменения состояния плеера для работы таймера
@@ -220,6 +225,8 @@ namespace AudioPlayer1
         {
             player.SetCurrentPosition(songBar.Value);
             progressBar.Value = songBar.Value;
+
+            //UpdateWaveProgress(wavePictureBox, songBar.Value);
         }
 
         // Удаление трека из плейлиста
@@ -248,7 +255,15 @@ namespace AudioPlayer1
                 player.Shuffle();
 
                 filesListBox.Items.Clear();
-                filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
+                var playlist = player.GetPlaylist();
+                var playlistPaths = player.GetPlaylistPaths();
+
+                for (int i = 0; i < playlist.Count; i++)
+                {
+                    string duration = player.GetTrackDuration(playlistPaths[i]);
+                    filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+                }
+
 
                 if (filesListBox.Items.Count > 0)
                 {
@@ -370,7 +385,23 @@ namespace AudioPlayer1
             }
         }
 
-        // Сортировка по а
+        //private void UpdateWaveProgress(PictureBox wavePictureBox, float progress)
+        //{
+        //    if (wavePictureBox.Image == null)
+        //        return;
+
+        //    var bitmap = new Bitmap(wavePictureBox.Image);
+        //    using (var g = Graphics.FromImage(bitmap))
+        //    {
+        //        int x = (int)(progress * bitmap.Width);
+        //        g.DrawLine(Pens.Red, x, 0, x, bitmap.Height);
+        //    }
+
+        //    wavePictureBox.Image = bitmap;
+        //    wavePictureBox.Invalidate();
+        //}
+
+        // Сортировка по алфавиту
         private bool isAscendingSort = true;
         private void sortButton_Click(object sender, EventArgs e)
         {
@@ -379,7 +410,14 @@ namespace AudioPlayer1
                 player.SortAlphabet(isAscendingSort);
 
                 filesListBox.Items.Clear();
-                filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
+                var playlist = player.GetPlaylist();
+                var playlistPaths = player.GetPlaylistPaths();
+
+                for (int i = 0; i < playlist.Count; i++)
+                {
+                    string duration = player.GetTrackDuration(playlistPaths[i]);
+                    filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+                }
 
                 if (filesListBox.Items.Count > 0)
                 {
@@ -399,6 +437,69 @@ namespace AudioPlayer1
             {
                 MessageBox.Show("Для сортировки должно быть хотя бы два файла в плейлисте.",
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // Сортировка по длительности трека
+        private bool isAscendingDur = true;
+        private void sortDurButton_Click(object sender, EventArgs e)
+        {
+            if (filesListBox.Items.Count > 1)
+            {
+                player.SortDuration(isAscendingDur);
+
+                filesListBox.Items.Clear();
+                var playlist = player.GetPlaylist();
+                var playlistPaths = player.GetPlaylistPaths();
+
+                for (int i = 0; i < playlist.Count; i++)
+                {
+                    string duration = player.GetTrackDuration(playlistPaths[i]);
+                    filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+                }
+
+                if (filesListBox.Items.Count > 0)
+                {
+                    filesListBox.SelectedIndex = 0;
+                }
+
+                if (isAscendingDur)
+                {
+                    isAscendingDur = false;
+                }
+                else
+                {
+                    isAscendingDur = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Для сортировки должно быть хотя бы два файла в плейлисте.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.SelectedItem == null) return;
+
+            try
+            {
+                string selectedValue = comboBox1.SelectedItem.ToString().Trim();
+
+                // Учитываем локаль для преобразования числа
+                float speed = float.Parse(selectedValue, System.Globalization.CultureInfo.InvariantCulture);
+                player.SetRate(speed);
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверный формат скорости воспроизведения.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка: {ex.Message}",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

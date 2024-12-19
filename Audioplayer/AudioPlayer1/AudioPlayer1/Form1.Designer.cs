@@ -42,10 +42,12 @@
             volumeLabel = new Label();
             tabControl1 = new TabControl();
             tabPage1 = new TabPage();
+            comboBox1 = new ComboBox();
             wavePictureBox = new PictureBox();
             prevSongLabel = new Label();
             nextSongLabel = new Label();
             currentSongLabel = new Label();
+            speedLabel = new Label();
             tabPage2 = new TabPage();
             sortDurButton = new Button();
             sortButton = new Button();
@@ -58,6 +60,7 @@
             timer1 = new System.Windows.Forms.Timer(components);
             songBar = new TrackBar();
             shuffleButton = new Button();
+            fastForwardButton = new Button();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -189,16 +192,27 @@
             // tabPage1
             // 
             tabPage1.BackColor = Color.PaleTurquoise;
+            tabPage1.Controls.Add(comboBox1);
             tabPage1.Controls.Add(wavePictureBox);
             tabPage1.Controls.Add(prevSongLabel);
             tabPage1.Controls.Add(nextSongLabel);
             tabPage1.Controls.Add(currentSongLabel);
+            tabPage1.Controls.Add(speedLabel);
             tabPage1.Location = new Point(4, 29);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
             tabPage1.Size = new Size(768, 313);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Главная";
+            // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(671, 25);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(91, 28);
+            comboBox1.TabIndex = 4;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // wavePictureBox
             // 
@@ -211,33 +225,44 @@
             // prevSongLabel
             // 
             prevSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            prevSongLabel.Location = new Point(6, 107);
+            prevSongLabel.Location = new Point(6, 170);
             prevSongLabel.Name = "prevSongLabel";
-            prevSongLabel.Size = new Size(342, 91);
+            prevSongLabel.Size = new Size(489, 55);
             prevSongLabel.TabIndex = 2;
             prevSongLabel.Text = "Предыдущий:";
-            prevSongLabel.TextAlign = ContentAlignment.TopCenter;
+            prevSongLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // nextSongLabel
             // 
             nextSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            nextSongLabel.Location = new Point(423, 107);
+            nextSongLabel.Location = new Point(6, 115);
             nextSongLabel.Name = "nextSongLabel";
-            nextSongLabel.Size = new Size(342, 91);
+            nextSongLabel.Size = new Size(489, 55);
             nextSongLabel.TabIndex = 1;
             nextSongLabel.Text = "Следующий:";
-            nextSongLabel.TextAlign = ContentAlignment.TopCenter;
+            nextSongLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // currentSongLabel
             // 
             currentSongLabel.Font = new Font("Segoe UI Semibold", 14F, FontStyle.Bold, GraphicsUnit.Point, 204);
             currentSongLabel.ForeColor = Color.Black;
-            currentSongLabel.Location = new Point(54, 17);
+            currentSongLabel.Location = new Point(6, 6);
             currentSongLabel.Name = "currentSongLabel";
-            currentSongLabel.Size = new Size(661, 103);
+            currentSongLabel.Size = new Size(441, 57);
             currentSongLabel.TabIndex = 0;
             currentSongLabel.Text = "Сейчас играет:";
-            currentSongLabel.TextAlign = ContentAlignment.TopCenter;
+            currentSongLabel.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // speedLabel
+            // 
+            speedLabel.Font = new Font("Segoe UI", 8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            speedLabel.ForeColor = Color.Black;
+            speedLabel.Location = new Point(479, 19);
+            speedLabel.Name = "speedLabel";
+            speedLabel.Size = new Size(226, 38);
+            speedLabel.TabIndex = 5;
+            speedLabel.Text = "Скорость воспроизведения:";
+            speedLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // tabPage2
             // 
@@ -262,6 +287,7 @@
             sortDurButton.TabIndex = 4;
             sortDurButton.Text = "Сортировать по длительности";
             sortDurButton.UseVisualStyleBackColor = true;
+            sortDurButton.Click += sortDurButton_Click;
             // 
             // sortButton
             // 
@@ -362,19 +388,31 @@
             shuffleButton.BackColor = SystemColors.Window;
             shuffleButton.BackgroundImage = (Image)resources.GetObject("shuffleButton.BackgroundImage");
             shuffleButton.BackgroundImageLayout = ImageLayout.Stretch;
-            shuffleButton.Location = new Point(463, 408);
+            shuffleButton.Location = new Point(499, 408);
             shuffleButton.Name = "shuffleButton";
             shuffleButton.Size = new Size(45, 45);
             shuffleButton.TabIndex = 14;
             shuffleButton.UseVisualStyleBackColor = false;
             shuffleButton.Click += shuffleButton_Click;
             // 
+            // fastForwardButton
+            // 
+            fastForwardButton.BackColor = SystemColors.Window;
+            fastForwardButton.BackgroundImage = (Image)resources.GetObject("fastForwardButton.BackgroundImage");
+            fastForwardButton.BackgroundImageLayout = ImageLayout.Stretch;
+            fastForwardButton.Location = new Point(412, 408);
+            fastForwardButton.Name = "fastForwardButton";
+            fastForwardButton.Size = new Size(45, 45);
+            fastForwardButton.TabIndex = 15;
+            fastForwardButton.UseVisualStyleBackColor = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.InactiveCaption;
-            ClientSize = new Size(800, 465);
+            ClientSize = new Size(798, 465);
+            Controls.Add(fastForwardButton);
             Controls.Add(shuffleButton);
             Controls.Add(labelPerc);
             Controls.Add(tabControl1);
@@ -436,5 +474,8 @@
         private Button sortButton;
         private Button button2;
         private Button sortDurButton;
+        private Button fastForwardButton;
+        private ComboBox comboBox1;
+        private Label speedLabel;
     }
 }

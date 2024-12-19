@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Xml.Linq;
 using WMPLib;
 
 namespace AudioPlayerLib
@@ -105,6 +107,15 @@ namespace AudioPlayerLib
             {
                 return "00:00";
             }
+        }
+        public double GetTrackDurationSeconds(string filePath)
+        {
+            WindowsMediaPlayer tempPlayer = new WindowsMediaPlayer();
+            IWMPMedia media = tempPlayer.newMedia(filePath);
+
+            double durationInSeconds = media.duration;
+
+            return durationInSeconds;
         }
         public bool isPlaying()
         {
@@ -294,6 +305,66 @@ namespace AudioPlayerLib
             {
                 wmp.URL = playlistPaths[currentTrackIndex];
                 Play();
+            }
+        }
+
+        public void SortDuration(bool isAscendingDur)
+        {
+            if (isAscendingDur)
+            {
+                var sortedPlaylist = safeFileNames
+                    .Zip(playlistPaths, (name, path) => new { Name = name, Path = path, Duration = GetTrackDurationSeconds(path) })
+                    .OrderBy(track => track.Duration)
+                    .ToList();
+
+                safeFileNames.Clear();
+                playlistPaths.Clear();
+
+                foreach (var track in sortedPlaylist)
+                {
+                    safeFileNames.Add(track.Name);
+                    playlistPaths.Add(track.Path);
+                }
+            }
+            else
+            {
+                var sortedPlaylist = safeFileNames
+                    .Zip(playlistPaths, (name, path) => new { Name = name, Path = path, Duration = GetTrackDurationSeconds(path) })
+                    .OrderByDescending(track => track.Duration)
+                    .ToList();
+
+                safeFileNames.Clear();
+                playlistPaths.Clear();
+
+                foreach (var track in sortedPlaylist)
+                {
+                    safeFileNames.Add(track.Name);
+                    playlistPaths.Add(track.Path);
+                }
+            }
+
+            currentTrackIndex = 0;
+            if (playlistPaths.Count > 0)
+            {
+                wmp.URL = playlistPaths[currentTrackIndex];
+                Play();
+            }
+        }
+
+        public void SetRate(float speed)
+        {
+            if (!isNull())
+            {
+                // Ограничиваем скорость воспроизведения в диапазоне от 0.5 до 2.0
+                if (speed >= 0.5f && speed <= 2.0f)
+                {
+                    wmp.settings.rate = speed;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(speed),
+                        "Скорость должна быть в диапазоне от 0.5x до 2.0x.");
+                }
             }
         }
 
