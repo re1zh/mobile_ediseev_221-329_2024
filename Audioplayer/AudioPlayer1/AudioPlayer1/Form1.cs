@@ -125,11 +125,10 @@ namespace AudioPlayer1
 
             if (selectedIndex >= 0 && selectedIndex < files.Count)
             {
-                string selectedPath = paths[filesListBox.SelectedIndex];
+                string selectedPath = player.GetPlaylistPaths()[selectedIndex];
                 player.SelectTrack(selectedIndex);
 
                 DrawWaveform(selectedPath, wavePictureBox);
-                //UpdateWaveProgress(wavePictureBox, 0);
 
                 player.Play();
             }
@@ -244,6 +243,11 @@ namespace AudioPlayer1
                 {
                     filesListBox.SelectedIndex = Math.Min(selectedIndex, filesListBox.Items.Count - 1);
                 }
+            }
+            else
+            {
+                MessageBox.Show("Выберите трек для удаления.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -385,22 +389,6 @@ namespace AudioPlayer1
             }
         }
 
-        //private void UpdateWaveProgress(PictureBox wavePictureBox, float progress)
-        //{
-        //    if (wavePictureBox.Image == null)
-        //        return;
-
-        //    var bitmap = new Bitmap(wavePictureBox.Image);
-        //    using (var g = Graphics.FromImage(bitmap))
-        //    {
-        //        int x = (int)(progress * bitmap.Width);
-        //        g.DrawLine(Pens.Red, x, 0, x, bitmap.Height);
-        //    }
-
-        //    wavePictureBox.Image = bitmap;
-        //    wavePictureBox.Invalidate();
-        //}
-
         // Сортировка по алфавиту
         private bool isAscendingSort = true;
         private void sortButton_Click(object sender, EventArgs e)
@@ -486,9 +474,8 @@ namespace AudioPlayer1
             try
             {
                 string selectedValue = comboBox1.SelectedItem.ToString().Trim();
-
-                // Учитываем локаль для преобразования числа
                 float speed = float.Parse(selectedValue, System.Globalization.CultureInfo.InvariantCulture);
+
                 player.SetRate(speed);
             }
             catch (FormatException)
@@ -513,7 +500,8 @@ namespace AudioPlayer1
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     player.SavePlaylist(saveFileDialog.FileName);
-                    MessageBox.Show("Плейлист успешно сохранен!", "Сохранение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Плейлист успешно сохранен!", 
+                        "Сохранение плейлиста", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }
@@ -526,12 +514,56 @@ namespace AudioPlayer1
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    player.LoadPlaylist(openFileDialog.FileName);
+                    string result = player.LoadPlaylist(openFileDialog.FileName);
 
                     filesListBox.Items.Clear();
-                    filesListBox.Items.AddRange(player.GetPlaylist().ToArray());
 
-                    MessageBox.Show("Плейлист успешно загружен!", "Загрузка", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var playlist = player.GetPlaylist();
+                    var playlistPaths = player.GetPlaylistPaths();
+                    for (int i = 0; i < playlist.Count; i++)
+                    {
+                        string duration = player.GetTrackDuration(playlistPaths[i]);
+                        files.Add(playlistPaths[i]);
+                        filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+                    }
+
+                    MessageBox.Show(result,
+                        result.StartsWith("Ошибка") ? "Ошибка" : "Успех",
+                        MessageBoxButtons.OK,
+                        result.StartsWith("Ошибка") ? MessageBoxIcon.Error : MessageBoxIcon.Information);
+
+                    if (filesListBox.Items.Count > 0)
+                    {
+                        filesListBox.SelectedIndex = 0;
+
+                        string firstFilePath = player.GetPlaylistPaths()[0];
+                        DrawWaveform(firstFilePath, wavePictureBox);
+                    }
+                }
+            }
+        }
+
+        private void exportButton_Click(object sender, EventArgs e)
+        {
+            if (filesListBox.Items.Count == 0)
+            {
+                MessageBox.Show("Плейлист пуст. Нечего экспортировать.",
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
+            {
+                if (folderBrowser.ShowDialog() == DialogResult.OK)
+                {
+                    string destinationPath = folderBrowser.SelectedPath;
+
+                    string result = player.ExportPlaylist(destinationPath);
+
+                    MessageBox.Show(result,
+                        result.StartsWith("Ошибка") ? "Ошибка" : "Успех",
+                        MessageBoxButtons.OK,
+                        result.StartsWith("Ошибка") ? MessageBoxIcon.Error : MessageBoxIcon.Information);
                 }
             }
         }

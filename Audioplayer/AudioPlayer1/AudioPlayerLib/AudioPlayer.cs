@@ -137,7 +137,8 @@ namespace AudioPlayerLib
 
         public void AddToPlaylist(string filePath)
         {
-            playlistPaths.Add(filePath);
+            if (System.IO.File.Exists(filePath))
+                playlistPaths.Add(filePath);
             safeFileNames.Add(System.IO.Path.GetFileName(filePath));
         }
 
@@ -149,6 +150,15 @@ namespace AudioPlayerLib
 
                 playlistPaths.RemoveAt(index);
                 safeFileNames.RemoveAt(index);
+
+                if (currentTrackIndex >= playlistPaths.Count)
+                {
+                    currentTrackIndex = playlistPaths.Count - 1;
+                }
+                else
+                {
+                    currentTrackIndex = -1;
+                }
             }
         }
 
@@ -355,7 +365,6 @@ namespace AudioPlayerLib
         {
             if (!isNull())
             {
-                // Ограничиваем скорость воспроизведения в диапазоне от 0.5 до 2.0
                 if (speed >= 0.5f && speed <= 2.0f)
                 {
                     wmp.settings.rate = speed;
@@ -424,11 +433,12 @@ namespace AudioPlayerLib
             }
         }
 
-        public void LoadPlaylist(string filePath)
+        public string LoadPlaylist(string filePath)
         {
             try
             {
                 var loadedPaths = System.IO.File.ReadAllLines(filePath).ToList();
+
                 playlistPaths.Clear();
                 safeFileNames.Clear();
 
@@ -436,14 +446,49 @@ namespace AudioPlayerLib
                 {
                     if (System.IO.File.Exists(path))
                     {
-                        playlistPaths.Add(path);
-                        safeFileNames.Add(System.IO.Path.GetFileName(path));
+                        AddToPlaylist(path);
                     }
                 }
+
+                if (playlistPaths.Count > 0)
+                {
+                    currentTrackIndex = 0;
+                }
+                else
+                {
+                    currentTrackIndex = -1;
+                }
+
+                return "Плейлист успешно загружен.";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при загрузке плейлиста: {ex.Message}");
+                return $"Ошибка загрузки плейлиста: {ex.Message}";
+            }
+        }
+
+        public string ExportPlaylist(string destinationPath)
+        {
+            if (playlistPaths.Count == 0)
+            {
+                return "Плейлист пуст. Нечего экспортировать.";
+            }
+
+            try
+            {
+                foreach (var filePath in playlistPaths)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    string destinationFile = Path.Combine(destinationPath, fileName);
+
+                    File.Copy(filePath, destinationFile, overwrite: true);
+                }
+
+                return "Файлы успешно экспортированы.";
+            }
+            catch (Exception ex)
+            {
+                return $"Ошибка при экспорте файлов: {ex.Message}";
             }
         }
     }

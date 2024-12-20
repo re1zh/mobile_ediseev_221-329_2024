@@ -49,6 +49,9 @@
             currentSongLabel = new Label();
             speedLabel = new Label();
             tabPage2 = new TabPage();
+            exportButton = new Button();
+            openPlaylistButton = new Button();
+            saveButton = new Button();
             sortDurButton = new Button();
             sortButton = new Button();
             deleteButton = new Button();
@@ -60,9 +63,6 @@
             timer1 = new System.Windows.Forms.Timer(components);
             songBar = new TrackBar();
             shuffleButton = new Button();
-            saveButton = new Button();
-            openPlaylistButton = new Button();
-            exportButton = new Button();
             ((System.ComponentModel.ISupportInitialize)volumeBar).BeginInit();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
@@ -286,6 +286,42 @@
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Плейлист";
             // 
+            // exportButton
+            // 
+            exportButton.BackColor = Color.FromArgb(255, 192, 255);
+            exportButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            exportButton.Location = new Point(494, 238);
+            exportButton.Name = "exportButton";
+            exportButton.Size = new Size(185, 43);
+            exportButton.TabIndex = 7;
+            exportButton.Text = "Экспорт плейлиста";
+            exportButton.UseVisualStyleBackColor = false;
+            exportButton.Click += exportButton_Click;
+            // 
+            // openPlaylistButton
+            // 
+            openPlaylistButton.BackColor = Color.FromArgb(224, 224, 224);
+            openPlaylistButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            openPlaylistButton.Location = new Point(580, 189);
+            openPlaylistButton.Name = "openPlaylistButton";
+            openPlaylistButton.Size = new Size(185, 43);
+            openPlaylistButton.TabIndex = 6;
+            openPlaylistButton.Text = "Открыть плейлист";
+            openPlaylistButton.UseVisualStyleBackColor = false;
+            openPlaylistButton.Click += openPlaylistButton_Click;
+            // 
+            // saveButton
+            // 
+            saveButton.BackColor = Color.FromArgb(224, 224, 224);
+            saveButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            saveButton.Location = new Point(396, 189);
+            saveButton.Name = "saveButton";
+            saveButton.Size = new Size(185, 43);
+            saveButton.TabIndex = 5;
+            saveButton.Text = "Сохранить плейлист";
+            saveButton.UseVisualStyleBackColor = false;
+            saveButton.Click += saveButton_Click;
+            // 
             // sortDurButton
             // 
             sortDurButton.Location = new Point(196, 238);
@@ -401,41 +437,6 @@
             shuffleButton.TabIndex = 14;
             shuffleButton.UseVisualStyleBackColor = false;
             shuffleButton.Click += shuffleButton_Click;
-            // 
-            // saveButton
-            // 
-            saveButton.BackColor = Color.FromArgb(224, 224, 224);
-            saveButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            saveButton.Location = new Point(396, 189);
-            saveButton.Name = "saveButton";
-            saveButton.Size = new Size(185, 43);
-            saveButton.TabIndex = 5;
-            saveButton.Text = "Сохранить плейлист";
-            saveButton.UseVisualStyleBackColor = false;
-            saveButton.Click += saveButton_Click;
-            // 
-            // openPlaylistButton
-            // 
-            openPlaylistButton.BackColor = Color.FromArgb(224, 224, 224);
-            openPlaylistButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            openPlaylistButton.Location = new Point(580, 189);
-            openPlaylistButton.Name = "openPlaylistButton";
-            openPlaylistButton.Size = new Size(185, 43);
-            openPlaylistButton.TabIndex = 6;
-            openPlaylistButton.Text = "Открыть плейлист";
-            openPlaylistButton.UseVisualStyleBackColor = false;
-            openPlaylistButton.Click += openPlaylistButton_Click;
-            // 
-            // exportButton
-            // 
-            exportButton.BackColor = Color.FromArgb(255, 192, 255);
-            exportButton.Font = new Font("Segoe UI", 7.8F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            exportButton.Location = new Point(494, 238);
-            exportButton.Name = "exportButton";
-            exportButton.Size = new Size(185, 43);
-            exportButton.TabIndex = 7;
-            exportButton.Text = "Экспорт плейлиста";
-            exportButton.UseVisualStyleBackColor = false;
             // 
             // Form1
             // 
