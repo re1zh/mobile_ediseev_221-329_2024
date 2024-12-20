@@ -174,6 +174,20 @@ namespace AudioPlayerApp
                         Console.ReadKey();
                         break;
                     case "16":
+                        Console.Write("Введите путь для экспорта плейлиста: ");
+                        string destinationPath = Console.ReadLine();
+
+                        try
+                        {
+                            player.LoadPlaylist(destinationPath);
+                            Console.WriteLine("Плейлист успешно экспортирован.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Ошибка: {ex.Message}");
+                        }
+                        Console.WriteLine("Нажмите любую клавишу для продолжения...");
+                        Console.ReadKey();
                         break;
                     case "17":
                         player.PrintPlaylist();
