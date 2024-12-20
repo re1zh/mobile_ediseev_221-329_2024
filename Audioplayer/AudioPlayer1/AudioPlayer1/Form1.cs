@@ -49,6 +49,23 @@ namespace AudioPlayer1
             }
         }
 
+        // Обновление плейлиста при взаимодействии с ним
+        private void UpdateFileList()
+        {
+            files.Clear();
+            filesListBox.Items.Clear();
+
+            var playlist = player.GetPlaylist();
+            var playlistPaths = player.GetPlaylistPaths();
+
+            for (int i = 0; i < playlist.Count; i++)
+            {
+                string duration = player.GetTrackDuration(playlistPaths[i]);
+                files.Add(playlistPaths[i]);
+                filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+            }
+        }
+
         // Обновление текущего, след. и пред. треков
         private void UpdateLabels()
         {
@@ -70,13 +87,6 @@ namespace AudioPlayer1
 
             int nextIndex = (currentIndex + 1) % playlist.Count;
             nextSongLabel.Text = $"Следующий: {playlist[nextIndex]}";
-        }
-
-        // Обновление progressBar
-        private void UpdateProgressBar()
-        {
-            songBar.Maximum = (int)player.GetDuration();
-            songBar.Value = (int)player.GetCurrentPosition();
         }
 
         // Очистка progressBar и progressLabel
@@ -140,7 +150,8 @@ namespace AudioPlayer1
             if (files.Count > 0 && filesListBox.SelectedIndex >= 0)
             {
                 player.Play();
-                UpdateProgressBar();
+                songBar.Maximum = (int)player.GetDuration();
+                songBar.Value = (int)player.GetCurrentPosition();
             }
             else
             {
@@ -467,6 +478,7 @@ namespace AudioPlayer1
             }
         }
 
+        // Ускорение/замедление трека
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedItem == null) return;
@@ -490,6 +502,7 @@ namespace AudioPlayer1
             }
         }
 
+        // Сохранение плейлиста
         private void saveButton_Click(object sender, EventArgs e)
         {
             using (SaveFileDialog saveFileDialog = new SaveFileDialog())
@@ -506,6 +519,7 @@ namespace AudioPlayer1
             }
         }
 
+        // Загрузка плейлиста
         private void openPlaylistButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -516,33 +530,20 @@ namespace AudioPlayer1
                 {
                     string result = player.LoadPlaylist(openFileDialog.FileName);
 
-                    filesListBox.Items.Clear();
-
-                    var playlist = player.GetPlaylist();
-                    var playlistPaths = player.GetPlaylistPaths();
-                    for (int i = 0; i < playlist.Count; i++)
+                    if (!result.StartsWith("Ошибка"))
                     {
-                        string duration = player.GetTrackDuration(playlistPaths[i]);
-                        files.Add(playlistPaths[i]);
-                        filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
+                        UpdateFileList();
                     }
 
                     MessageBox.Show(result,
                         result.StartsWith("Ошибка") ? "Ошибка" : "Успех",
                         MessageBoxButtons.OK,
                         result.StartsWith("Ошибка") ? MessageBoxIcon.Error : MessageBoxIcon.Information);
-
-                    if (filesListBox.Items.Count > 0)
-                    {
-                        filesListBox.SelectedIndex = 0;
-
-                        string firstFilePath = player.GetPlaylistPaths()[0];
-                        DrawWaveform(firstFilePath, wavePictureBox);
-                    }
                 }
             }
         }
 
+        // Экспорт плейлиста
         private void exportButton_Click(object sender, EventArgs e)
         {
             if (filesListBox.Items.Count == 0)

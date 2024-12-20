@@ -8,13 +8,11 @@ namespace AudioPlayerLib
 {
     public class AudioPlayer
     {
+        #region Поля
         private readonly WindowsMediaPlayer wmp = new();
-
         private readonly List<string> playlistPaths = new();
         private readonly List<string> safeFileNames = new();
-
         private int currentTrackIndex = -1;
-
         public event Action<int>? OnTrackChanged;
         public enum PlayerState
         {
@@ -22,9 +20,16 @@ namespace AudioPlayerLib
             Paused,
             Stopped
         }
-
         public event Action<PlayerState> OnPlayStateChanged;
+        #endregion
 
+        public AudioPlayer()
+        {
+            wmp.settings.volume = 25;
+            wmp.PlayStateChange += OnPlayStateChange;
+        }
+
+        // Обработчик события изменения состояния плеера
         private void OnPlayStateChange(int newState)
         {
             WMPPlayState state = (WMPPlayState)newState;
@@ -54,17 +59,10 @@ namespace AudioPlayerLib
             }
         }
 
-        public AudioPlayer()
-        {
-            wmp.settings.volume = 25;
-            wmp.PlayStateChange += OnPlayStateChange;
-        }
-
+        #region Геттеры
         public List<string> GetPlaylistPaths() => new List<string>(playlistPaths);
         public List<string> GetPlaylist() => new List<string>(safeFileNames);
         public int GetCurrentTrackIndex() => currentTrackIndex;
-
-        public WMPPlayState CurrentState => wmp.playState;
         public int GetVolume()
         {
             return wmp?.settings.volume ?? 25;
@@ -76,10 +74,6 @@ namespace AudioPlayerLib
         public string GetCurrentPositionString()
         {
             return wmp.controls.currentPositionString;
-        }
-        public void SetCurrentPosition(double position)
-        {
-            wmp.controls.currentPosition = position;
         }
         public double GetDuration()
         {
@@ -117,6 +111,38 @@ namespace AudioPlayerLib
 
             return durationInSeconds;
         }
+        #endregion
+
+        #region Сеттеры
+        public void SetCurrentPosition(double position)
+        {
+            wmp.controls.currentPosition = position;
+        }
+        public void SetVolume(int volume)
+        {
+            if (!isNull())
+            {
+                wmp.settings.volume = volume;
+            }
+        }
+        public void SetRate(float speed)
+        {
+            if (!isNull())
+            {
+                if (speed >= 0.5f && speed <= 2.0f)
+                {
+                    wmp.settings.rate = speed;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException(nameof(speed),
+                        "Скорость должна быть в диапазоне от 0.5x до 2.0x.");
+                }
+            }
+        }
+        #endregion
+
+        #region Проверки состояний
         public bool isPlaying()
         {
             return wmp.playState == WMPLib.WMPPlayState.wmppsPlaying;
@@ -133,8 +159,9 @@ namespace AudioPlayerLib
         {
             return wmp == null;
         }
+        #endregion
 
-
+        // Добавление трека в плейлист
         public void AddToPlaylist(string filePath)
         {
             if (System.IO.File.Exists(filePath))
@@ -142,6 +169,7 @@ namespace AudioPlayerLib
             safeFileNames.Add(System.IO.Path.GetFileName(filePath));
         }
 
+        // Удаление трека из плейлиста
         public void RemoveFromPlaylist(int index)
         {
             if (index >= 0 && index < playlistPaths.Count)
@@ -162,6 +190,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Выбор трека
         public void SelectTrack(int index)
         {
             if (index >= 0 && index < playlistPaths.Count)
@@ -177,6 +206,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Проигрывание трека
         public void Play()
         {
             if (currentTrackIndex >= 0 && currentTrackIndex < playlistPaths.Count)
@@ -200,6 +230,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Пауза
         public void Pause()
         {
             if (!isNull() && isPlaying())
@@ -209,12 +240,14 @@ namespace AudioPlayerLib
             }
         }
 
+        // Стоп
         public void Stop()
         {
             wmp.controls.stop();
             Console.WriteLine("Стоп.");
         }
 
+        // Следующий трек
         public void Next()
         {
             if (playlistPaths.Count > 0 && currentTrackIndex >= 0)
@@ -232,6 +265,8 @@ namespace AudioPlayerLib
                 return;
             }
         }
+
+        // Предыдущий трек
         public void Previous()
         {
             if (playlistPaths.Count > 0 && currentTrackIndex >= 0)
@@ -247,14 +282,7 @@ namespace AudioPlayerLib
             }
         }
 
-        public void SetVolume(int volume)
-        {
-            if (!isNull())
-            {
-                wmp.settings.volume = volume;
-            }
-        }
-
+        // Перемешивание плейлиста
         public void Shuffle()
         {
             var rand = new Random();
@@ -275,6 +303,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Сортировка по алфавиту
         public void SortAlphabet(bool isAscending)
         {
             if (isAscending)
@@ -318,6 +347,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Сортировка по длине трека
         public void SortDuration(bool isAscendingDur)
         {
             if (isAscendingDur)
@@ -361,22 +391,7 @@ namespace AudioPlayerLib
             }
         }
 
-        public void SetRate(float speed)
-        {
-            if (!isNull())
-            {
-                if (speed >= 0.5f && speed <= 2.0f)
-                {
-                    wmp.settings.rate = speed;
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(speed),
-                        "Скорость должна быть в диапазоне от 0.5x до 2.0x.");
-                }
-            }
-        }
-
+        // Вывод плейлиста в консоль
         public void PrintPlaylist()
         {
             if (playlistPaths.Count == 0)
@@ -393,6 +408,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Перемещение трека в плейлисте с помощью мыши
         public void MoveTrack(int oldIndex, int newIndex)
         {
             if (oldIndex >= 0 && oldIndex < playlistPaths.Count && newIndex >= 0 && newIndex < playlistPaths.Count)
@@ -421,6 +437,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Сохранить плейлист
         public void SavePlaylist(string filePath)
         {
             try
@@ -433,6 +450,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Загрузить плейлист
         public string LoadPlaylist(string filePath)
         {
             try
@@ -467,6 +485,7 @@ namespace AudioPlayerLib
             }
         }
 
+        // Экспорт плейлиста
         public string ExportPlaylist(string destinationPath)
         {
             if (playlistPaths.Count == 0)
