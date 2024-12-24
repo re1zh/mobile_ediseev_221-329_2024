@@ -208,8 +208,6 @@ namespace AudioPlayer1
             {
                 progressBar.Value = songBar.Value;
             }
-
-            //UpdateWaveProgress(wavePictureBox, songBar.Value);
         }
 
         // Обработчик изменения состояния плеера для работы таймера

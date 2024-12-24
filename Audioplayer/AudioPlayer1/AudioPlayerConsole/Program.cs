@@ -174,7 +174,7 @@ namespace AudioPlayerApp
                         Console.ReadKey();
                         break;
                     case "16":
-                        Console.Write("Введите путь для экспорта плейлиста: ");
+                        Console.Write("Введите путь для экспорта плейлиста : ");
                         string destinationPath = Console.ReadLine();
 
                         try
