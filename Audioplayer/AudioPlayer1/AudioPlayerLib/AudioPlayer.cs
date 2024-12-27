@@ -338,13 +338,6 @@ namespace AudioPlayerLib
                     playlistPaths.Add(track.Path);
                 }
             }
-
-            currentTrackIndex = 0;
-            if (playlistPaths.Count > 0)
-            {
-                wmp.URL = playlistPaths[currentTrackIndex];
-                Play();
-            }
         }
 
         // Сортировка по длине трека
@@ -381,13 +374,6 @@ namespace AudioPlayerLib
                     safeFileNames.Add(track.Name);
                     playlistPaths.Add(track.Path);
                 }
-            }
-
-            currentTrackIndex = 0;
-            if (playlistPaths.Count > 0)
-            {
-                wmp.URL = playlistPaths[currentTrackIndex];
-                Play();
             }
         }
 
@@ -486,7 +472,7 @@ namespace AudioPlayerLib
         }
 
         // Экспорт плейлиста
-        public string ExportPlaylist(string destinationPath)
+        public string ExportPlaylist(string destinationFolder)
         {
             if (playlistPaths.Count == 0)
             {
@@ -495,14 +481,14 @@ namespace AudioPlayerLib
 
             try
             {
-                foreach (var filePath in playlistPaths)
+                for (int i = 0; i < playlistPaths.Count; i++)
                 {
-                    string fileName = Path.GetFileName(filePath);
-                    string destinationFile = Path.Combine(destinationPath, fileName);
+                    string sourcePath = playlistPaths[i];
+                    string fileName = $"{i + 1}. {safeFileNames[i]}";
+                    string destinationPath = Path.Combine(destinationFolder, fileName);
 
-                    File.Copy(filePath, destinationFile, overwrite: true);
+                    File.Copy(sourcePath, destinationPath, overwrite: true);
                 }
-
                 return "Файлы успешно экспортированы.";
             }
             catch (Exception ex)

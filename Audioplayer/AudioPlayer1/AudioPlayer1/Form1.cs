@@ -116,8 +116,10 @@ namespace AudioPlayer1
 
             if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                int i = 0;
                 foreach (string file in ofd.FileNames)
                 {
+                    i++;
                     files.Add(file);
                     string duration = player.GetTrackDuration(file);
                     filesListBox.Items.Add($"{Path.GetFileName(file),-30}\t{duration}");
@@ -416,11 +418,6 @@ namespace AudioPlayer1
                     filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
                 }
 
-                if (filesListBox.Items.Count > 0)
-                {
-                    filesListBox.SelectedIndex = 0;
-                }
-
                 if (isAscendingSort)
                 {
                     isAscendingSort = false;
@@ -453,11 +450,6 @@ namespace AudioPlayer1
                 {
                     string duration = player.GetTrackDuration(playlistPaths[i]);
                     filesListBox.Items.Add($"{playlist[i],-30}\t{duration}");
-                }
-
-                if (filesListBox.Items.Count > 0)
-                {
-                    filesListBox.SelectedIndex = 0;
                 }
 
                 if (isAscendingDur)
@@ -511,7 +503,7 @@ namespace AudioPlayer1
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     player.SavePlaylist(saveFileDialog.FileName);
-                    MessageBox.Show("Плейлист успешно сохранен!", 
+                    MessageBox.Show("Плейлист успешно сохранен!",
                         "Сохранение плейлиста", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
