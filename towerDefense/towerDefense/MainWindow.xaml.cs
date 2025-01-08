@@ -13,11 +13,19 @@ namespace towerDefense
         private const int CellSize = 45;
         private const int GridWidth = 16;
         private const int GridHeight = 9;
+        private Rectangle[,] gridCells = new Rectangle[GridHeight, GridWidth];
+
+        private List<(int row, int col)> staticPath = new List<(int row, int col)>
+        {
+            (0, 0), (1, 0), (2, 0), (3, 0), (3, 1), (3, 2), (3, 3), (2, 3),
+            (1, 3), (1, 4), (1, 5), (2, 5), (3, 5), (3, 6), (3, 7), (2, 7),
+            (1, 7), (0, 7), (0, 8), (0, 9), (0, 10), (1, 10), (2, 10), (3, 10),
+            (4, 10), (5, 10), (6, 10), (6, 11), (6, 12), (6, 13), (6, 14), (6, 15)
+        };
 
         private GameManager gameManager = new GameManager();
-        private DispatcherTimer gameLoopTimer = new DispatcherTimer();
 
-        private Rectangle[,] gridCells = new Rectangle[GridHeight, GridWidth];
+        private DispatcherTimer gameLoopTimer = new DispatcherTimer();
 
         public MainWindow()
         {
@@ -28,6 +36,7 @@ namespace towerDefense
             gameLoopTimer.Start();
 
             DrawGrid();
+            InitializeEnemies();
         }
 
         private void GameLoop(object sender, EventArgs e)
@@ -52,7 +61,13 @@ namespace towerDefense
                     };
 
                     Canvas.SetLeft(cell, col * CellSize);
-                    Canvas.SetTop(cell, row * CellSize);
+                    Canvas.SetTop(cell, row * CellSize);  
+                    
+                    // Проверяем, является ли клетка частью пути
+                    if (staticPath.Contains((row, col)))
+                    {
+                        cell.Fill = Brushes.Green; // Клетка пути
+                    }
 
                     cell.MouseLeftButtonDown += (s, e) =>
                     {
@@ -93,6 +108,17 @@ namespace towerDefense
             {
                 MessageBox.Show($"CreateTower Exception: {ex.Message}");
             }
+        }
+
+        private void InitializeEnemies()
+        {
+            var startCell = staticPath[0]; // Начальная точка пути
+            int startX = startCell.col * CellSize;
+            int startY = startCell.row * CellSize;
+
+            var enemy = new Enemy(startX, startY, 100, 2); // 2 — скорость врага
+            enemy.SetPath(staticPath); // Задаем путь
+            gameManager.Enemies.Add(enemy);
         }
 
         private void RenderGame()
