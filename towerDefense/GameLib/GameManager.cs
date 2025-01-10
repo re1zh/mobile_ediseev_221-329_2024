@@ -14,14 +14,11 @@
 
             foreach (var tower in Towers)
             {
-                var target = tower.FindTarget(Enemies);
-                if (target != null)
-                {
-                    target.TakeDamage(tower.Damage);
-                }
+                tower.Shoot(Enemies);
+                tower.Update();
             }
 
-            Enemies.RemoveAll(e => !e.IsActive);
+            Enemies.RemoveAll(e => !e.IsActive && !e.HasReachedEnd);
         }
     }
 }

@@ -6,6 +6,7 @@
         public int Speed { get; set; }
         private List<(int row, int col)> Path { get; set; } = new List<(int row, int col)>();
         private int CurrentPathIndex { get; set; } = 0;
+        public bool HasReachedEnd { get; private set; } = false;
 
         public Enemy(int x, int y, int health, int speed)
         {
@@ -18,28 +19,26 @@
         public void SetPath(List<(int row, int col)> path)
         {
             Path = path;
-            CurrentPathIndex = 0; // Сбрасываем индекс в начало пути
+            CurrentPathIndex = 0;
         }
 
         public override void Update()
         {
             if (CurrentPathIndex >= Path.Count)
             {
-                IsActive = false; // Враг завершил путь
+                HasReachedEnd = true;
+                IsActive = false;
                 return;
             }
 
-            // Целевая клетка на пути
             var targetCell = Path[CurrentPathIndex];
-            int targetX = targetCell.col * 45; // 45 — размер клетки
+            int targetX = targetCell.col * 45;
             int targetY = targetCell.row * 45;
 
-            // Вычисляем расстояние до цели
             double deltaX = targetX - X;
             double deltaY = targetY - Y;
             double distance = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
 
-            // Если достигли цели, переключаемся на следующую точку
             if (distance < Speed)
             {
                 X = targetX;
@@ -48,7 +47,6 @@
             }
             else
             {
-                // Движение в направлении цели
                 X += (int)(Speed * deltaX / distance);
                 Y += (int)(Speed * deltaY / distance);
             }

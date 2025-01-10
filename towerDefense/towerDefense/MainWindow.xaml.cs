@@ -26,6 +26,7 @@ namespace towerDefense
         private GameManager gameManager = new GameManager();
 
         private DispatcherTimer gameLoopTimer = new DispatcherTimer();
+        private DispatcherTimer enemySpawnTimer = new DispatcherTimer();
 
         public MainWindow()
         {
@@ -35,13 +36,17 @@ namespace towerDefense
             gameLoopTimer.Tick += GameLoop;
             gameLoopTimer.Start();
 
+            enemySpawnTimer.Interval = TimeSpan.FromSeconds(1);
+            enemySpawnTimer.Tick += SpawnEnemy;
+            enemySpawnTimer.Start();
+
             DrawGrid();
-            InitializeEnemies();
         }
 
         private void GameLoop(object sender, EventArgs e)
         {
             gameManager.Update();
+            CheckForLoss();
             RenderGame();
         }
 
@@ -63,10 +68,9 @@ namespace towerDefense
                     Canvas.SetLeft(cell, col * CellSize);
                     Canvas.SetTop(cell, row * CellSize);  
                     
-                    // Проверяем, является ли клетка частью пути
                     if (staticPath.Contains((row, col)))
                     {
-                        cell.Fill = Brushes.Green; // Клетка пути
+                        cell.Fill = Brushes.Green;
                     }
 
                     cell.MouseLeftButtonDown += (s, e) =>
@@ -101,7 +105,7 @@ namespace towerDefense
                     return;
                 }
 
-                var newTower = new Tower(col * CellSize, row * CellSize, 150, 20);
+                var newTower = new Tower(col * CellSize, row * CellSize, 100, 20, 10);
                 gameManager.Towers.Add(newTower);
             }
             catch (Exception ex)
@@ -110,15 +114,28 @@ namespace towerDefense
             }
         }
 
-        private void InitializeEnemies()
+        private void SpawnEnemy(object sender, EventArgs e)
         {
-            var startCell = staticPath[0]; // Начальная точка пути
+            var startCell = staticPath[0];
             int startX = startCell.col * CellSize;
             int startY = startCell.row * CellSize;
 
-            var enemy = new Enemy(startX, startY, 100, 2); // 2 — скорость врага
-            enemy.SetPath(staticPath); // Задаем путь
+            var enemy = new Enemy(startX, startY, 200, 2);
+            enemy.SetPath(staticPath);
             gameManager.Enemies.Add(enemy);
+        }
+
+        private void CheckForLoss()
+        {
+            if (gameManager.Enemies.Any(enemy => enemy.HasReachedEnd))
+            {
+                gameLoopTimer.Stop();
+                enemySpawnTimer.Stop();
+
+                MessageBox.Show("Вы проиграли!", "Игра окончена");
+
+                //Application.Current.Shutdown();
+            }
         }
 
         private void RenderGame()
@@ -142,8 +159,8 @@ namespace towerDefense
             {
                 var enemyRect = new Rectangle
                 {
-                    Width = 20,
-                    Height = 20,
+                    Width = 45,
+                    Height = 45,
                     Fill = Brushes.Red
                 };
                 Canvas.SetLeft(enemyRect, enemy.X);
@@ -162,6 +179,19 @@ namespace towerDefense
                 Canvas.SetLeft(towerRect, tower.X);
                 Canvas.SetTop(towerRect, tower.Y);
                 GameCanvas.Children.Add(towerRect);
+
+                foreach (var projectile in tower.Projectiles)
+                {
+                    var projectileRect = new Rectangle
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Fill = Brushes.Orange
+                    };
+                    Canvas.SetLeft(projectileRect, projectile.X);
+                    Canvas.SetTop(projectileRect, projectile.Y);
+                    GameCanvas.Children.Add(projectileRect);
+                }
             }
         }
     }
