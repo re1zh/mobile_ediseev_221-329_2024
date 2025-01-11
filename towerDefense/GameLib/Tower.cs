@@ -27,7 +27,7 @@
             return (int)Math.Sqrt(Math.Pow(X - obj.X, 2) + Math.Pow(Y - obj.Y, 2));
         }
 
-        public void Shoot(IEnumerable<Enemy> enemies)
+        public void Shoot(IEnumerable<Enemy> enemies, GameManager gameManager)
         {
             if (currentCooldown > 0)
             {
@@ -38,7 +38,17 @@
             Enemy target = FindTarget(enemies);
             if (target != null)
             {
-                var projectile = new Projectile(X, Y, 10, Damage, target);
+                int towerSize = 45;
+
+                var projectile = new Projectile(
+                    X + towerSize / 2,
+                    Y + towerSize / 2,
+                    10,
+                    Damage,
+                    target,
+                    gameManager
+                );
+
                 Projectiles.Add(projectile);
                 currentCooldown = FireRate;
             }

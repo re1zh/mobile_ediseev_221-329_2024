@@ -5,14 +5,16 @@
         public int Speed { get; set; }
         public int Damage { get; set; }
         public Enemy Target { get; private set; }
+        private GameManager gameManager;
 
-        public Projectile(int x, int y, int speed, int damage, Enemy target)
+        public Projectile(int x, int y, int speed, int damage, Enemy target, GameManager gameManager)
         {
             X = x;
             Y = y;
             Speed = speed;
             Damage = damage;
             Target = target;
+            this.gameManager = gameManager;
         }
 
         public override void Update()
@@ -37,7 +39,9 @@
             {
                 X = Target.X;
                 Y = Target.Y;
-                Target.TakeDamage(Damage);
+
+                Target.TakeDamage(Damage, gameManager);
+
                 IsActive = false;
             }
             else

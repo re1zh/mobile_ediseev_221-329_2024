@@ -15,24 +15,31 @@ using System.Windows.Shapes;
 namespace towerDefense
 {
     /// <summary>
-    /// Логика взаимодействия для Window1.xaml
+    /// Логика взаимодействия для MainMenu.xaml
     /// </summary>
-    public partial class Window1 : Window
+    public partial class MainMenu : Window
     {
-        public Window1()
+        public MainMenu()
         {
             InitializeComponent();
         }
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow gameWindow = new MainWindow();
-            gameWindow.Show();
-
+            LevelSelection levelSelectWindow = new LevelSelection();
+            levelSelectWindow.Show();
             this.Close();
         }
+
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void AboutButton_Click(object sender, RoutedEventArgs e)
+        {
+            About aboutWindow = new About();
+            aboutWindow.Show();
+            this.Close();
         }
     }
 }

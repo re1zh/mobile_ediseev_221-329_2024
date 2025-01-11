@@ -32,6 +32,7 @@
             }
 
             var targetCell = Path[CurrentPathIndex];
+
             int targetX = targetCell.col * 45;
             int targetY = targetCell.row * 45;
 
@@ -52,12 +53,20 @@
             }
         }
 
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, GameManager gameManager)
         {
             Health -= damage;
-            if (Health <= 0)
+            if (Health <= 0 && IsActive)
             {
                 IsActive = false;
+                try
+                {
+                    gameManager.RewardForEnemyKill();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Ошибка: {e.Message}");
+                }
             }
         }
     }
