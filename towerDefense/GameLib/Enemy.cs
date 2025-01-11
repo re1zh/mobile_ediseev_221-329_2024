@@ -3,6 +3,7 @@
     public class Enemy : GameObject
     {
         public int Health { get; set; }
+        public int MaxHealth { get; private set; }
         public int Speed { get; set; }
         private List<(int row, int col)> Path { get; set; } = new List<(int row, int col)>();
         private int CurrentPathIndex { get; set; } = 0;
@@ -13,6 +14,7 @@
             X = x;
             Y = y;
             Health = health;
+            MaxHealth = health;
             Speed = speed;
         }
 

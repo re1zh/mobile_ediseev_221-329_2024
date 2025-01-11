@@ -4,7 +4,7 @@
     {
         public List<Enemy> Enemies { get; private set; } = new List<Enemy>();
         public List<Tower> Towers { get; private set; } = new List<Tower>();
-        public int PlayerMoney { get; private set; } = 10;
+        public int PlayerMoney { get; private set; } = 15;
 
         private const int TowerCost = 10;
         private const int EnemyReward = 5;

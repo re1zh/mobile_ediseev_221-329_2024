@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -165,13 +166,13 @@ namespace towerDefense
             gameLoopTimer.Tick += GameLoop;
             gameLoopTimer.Start();
 
+            gameTimer.Interval = TimeSpan.FromSeconds(1);
+            gameTimer.Tick += GameTimer_Tick;
+            gameTimer.Start();
+
             enemySpawnTimer.Interval = TimeSpan.FromSeconds(2);
             enemySpawnTimer.Tick += SpawnEnemy;
             enemySpawnTimer.Start();
-
-            gameTimer.Interval = TimeSpan.FromSeconds(2);
-            gameTimer.Tick += GameTimer_Tick;
-            gameTimer.Start();
 
             SpawnEnemy(null, null);
         }
@@ -266,12 +267,15 @@ namespace towerDefense
             if (gameManager.Enemies.Any(enemy => enemy.HasReachedEnd))
             {
                 isGameOver = true;
-                gameLoopTimer.Stop();
-                gameTimer.Stop();
-                enemySpawnTimer.Stop();
+                StopAllTimers();
 
                 MessageBox.Show("Вы проиграли!", "Игра окончена");
                 //Application.Current.Shutdown();
+
+                LevelSelection levelSelection = new LevelSelection();
+                levelSelection.Show();
+
+                this.Close();
             }
         }
 
@@ -280,10 +284,14 @@ namespace towerDefense
             if (!gameManager.Enemies.Any(enemy => enemy.HasReachedEnd))
             {
                 isGameOver = true;
-                gameLoopTimer.Stop();
-                enemySpawnTimer.Stop();
+                StopAllTimers();
                 MessageBox.Show("Вы выиграли!", "Игра окончена");
                 //Application.Current.Shutdown();
+
+                LevelSelection levelSelection = new LevelSelection();
+                levelSelection.Show();
+
+                this.Close();
             }
         }
 
@@ -311,17 +319,33 @@ namespace towerDefense
 
             foreach (var enemy in gameManager.Enemies)
             {
+                double healthPercentage = (double)enemy.Health / enemy.MaxHealth;
+
                 var enemyRect = new Rectangle
                 {
                     Width = 45,
                     Height = 45,
-                    Fill = Brushes.Red
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1,
+                    Fill = Brushes.Black
                 };
 
                 Canvas.SetLeft(enemyRect, enemy.X);
                 Canvas.SetTop(enemyRect, enemy.Y);
 
                 GameCanvas.Children.Add(enemyRect);
+
+                var healthBar = new Rectangle
+                {
+                    Width = 45,
+                    Height = 45 * healthPercentage,
+                    Fill = Brushes.Red
+                };
+
+                Canvas.SetLeft(healthBar, enemy.X);
+                Canvas.SetTop(healthBar, enemy.Y + (45 * (1 - healthPercentage)));
+
+                GameCanvas.Children.Add(healthBar);
             }
 
             foreach (var tower in gameManager.Towers)
@@ -330,6 +354,8 @@ namespace towerDefense
                 {
                     Width = 45,
                     Height = 45,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1,
                     Fill = Brushes.Blue
                 };
 
@@ -363,8 +389,8 @@ namespace towerDefense
             {
                 StopAllTimers();
 
-                MainMenu mainMenu = new MainMenu();
-                mainMenu.Show();
+                LevelSelection levelSelection = new LevelSelection();
+                levelSelection.Show();
 
                 this.Close();
             }
