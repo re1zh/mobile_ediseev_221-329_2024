@@ -2,11 +2,31 @@
 {
     public class Tower : GameObject
     {
-        public int Range { get; set; }
-        public int Damage { get; set; }
-        public int FireRate { get; set; }
-        private int currentCooldown = 0;
-        public List<Projectile> Projectiles { get; private set; } = new List<Projectile>();
+        private int _range;
+        private int _damage;
+        private int _fireRate;
+        private int _currentCooldown = 0;
+        private List<Projectile> _projectiles = new List<Projectile>();
+
+        public int Range
+        {
+            get => _range;
+            private set => _range = value;
+        }
+
+        public int Damage
+        {
+            get => _damage;
+            private set => _damage = value;
+        }
+
+        public int FireRate
+        {
+            get => _fireRate;
+            private set => _fireRate = value;
+        }
+
+        public IReadOnlyList<Projectile> Projectiles => _projectiles.AsReadOnly();
 
         public Tower(int x, int y, int range, int damage, int fireRate)
         {
@@ -29,9 +49,9 @@
 
         public void Shoot(IEnumerable<Enemy> enemies, GameManager gameManager)
         {
-            if (currentCooldown > 0)
+            if (_currentCooldown > 0)
             {
-                currentCooldown--;
+                _currentCooldown--;
                 return;
             }
 
@@ -48,20 +68,18 @@
                     target,
                     gameManager
                 );
-
-                Projectiles.Add(projectile);
-                currentCooldown = FireRate;
+                _projectiles.Add(projectile);
+                _currentCooldown = FireRate;
             }
         }
 
         public override void Update()
         {
-            foreach (var projectile in Projectiles)
+            foreach (var projectile in _projectiles)
             {
                 projectile.Update();
             }
-
-            Projectiles.RemoveAll(p => !p.IsActive);
+            _projectiles.RemoveAll(p => !p.IsActive);
         }
     }
 }

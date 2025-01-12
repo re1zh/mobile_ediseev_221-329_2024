@@ -2,10 +2,28 @@
 {
     public class Projectile : GameObject
     {
-        public int Speed { get; set; }
-        public int Damage { get; set; }
-        public Enemy Target { get; private set; }
-        private GameManager gameManager;
+        private int _speed;
+        private int _damage;
+        private Enemy _target;
+        private GameManager _gameManager;
+
+        public int Speed
+        {
+            get => _speed;
+            private set => _speed = value;
+        }
+
+        public int Damage
+        {
+            get => _damage;
+            private set => _damage = value;
+        }
+
+        public Enemy Target
+        {
+            get => _target;
+            private set => _target = value;
+        }
 
         public Projectile(int x, int y, int speed, int damage, Enemy target, GameManager gameManager)
         {
@@ -14,7 +32,7 @@
             Speed = speed;
             Damage = damage;
             Target = target;
-            this.gameManager = gameManager;
+            _gameManager = gameManager;
         }
 
         public override void Update()
@@ -40,7 +58,7 @@
                 X = Target.X;
                 Y = Target.Y;
 
-                Target.TakeDamage(Damage, gameManager);
+                Target.TakeDamage(Damage, _gameManager);
 
                 IsActive = false;
             }

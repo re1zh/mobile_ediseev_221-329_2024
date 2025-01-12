@@ -2,12 +2,36 @@
 {
     public class Enemy : GameObject
     {
-        public int Health { get; set; }
-        public int MaxHealth { get; private set; }
-        public int Speed { get; set; }
-        private List<(int row, int col)> Path { get; set; } = new List<(int row, int col)>();
-        private int CurrentPathIndex { get; set; } = 0;
-        public bool HasReachedEnd { get; private set; } = false;
+        private int _health;
+        private int _maxHealth;
+        private int _speed;
+        private List<(int row, int col)> _path = new List<(int row, int col)>();
+        private int _currentPathIndex = 0;
+        private bool _hasReachedEnd = false;
+
+        public int Health
+        {
+            get => _health;
+            private set => _health = value;
+        }
+
+        public int MaxHealth
+        {
+            get => _maxHealth;
+            private set => _maxHealth = value;
+        }
+
+        public int Speed
+        {
+            get => _speed;
+            private set => _speed = value;
+        }
+
+        public bool HasReachedEnd
+        {
+            get => _hasReachedEnd;
+            private set => _hasReachedEnd = value;
+        }
 
         public Enemy(int x, int y, int health, int speed)
         {
@@ -20,21 +44,20 @@
 
         public void SetPath(List<(int row, int col)> path)
         {
-            Path = path;
-            CurrentPathIndex = 0;
+            _path = path;
+            _currentPathIndex = 0;
         }
 
         public override void Update()
         {
-            if (CurrentPathIndex >= Path.Count)
+            if (_currentPathIndex >= _path.Count)
             {
                 HasReachedEnd = true;
                 IsActive = false;
                 return;
             }
 
-            var targetCell = Path[CurrentPathIndex];
-
+            var targetCell = _path[_currentPathIndex];
             int targetX = targetCell.col * 45;
             int targetY = targetCell.row * 45;
 
@@ -46,7 +69,7 @@
             {
                 X = targetX;
                 Y = targetY;
-                CurrentPathIndex++;
+                _currentPathIndex++;
             }
             else
             {

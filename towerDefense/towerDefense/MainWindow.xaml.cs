@@ -26,7 +26,6 @@ namespace towerDefense
         private DispatcherTimer countdownTimer = new DispatcherTimer();
 
         private int countdownValue = 5;
-        private bool gameStarted = false;
 
         private int gameDuration = 60;
         private int elapsedSeconds = 0;
@@ -112,7 +111,6 @@ namespace towerDefense
             gameLoopTimer.Stop();
             enemySpawnTimer.Stop();
             gameTimer.Stop();
-            countdownTimer.Stop();
         }
 
         private void CountdownTimer_Tick(object sender, EventArgs e)
@@ -160,8 +158,6 @@ namespace towerDefense
 
         private void StartGame()
         {
-            gameStarted = true;
-
             gameLoopTimer.Interval = TimeSpan.FromMilliseconds(16);
             gameLoopTimer.Tick += GameLoop;
             gameLoopTimer.Start();
@@ -259,7 +255,7 @@ namespace towerDefense
 
             var enemy = new Enemy(startX, startY, 200, 3);
             enemy.SetPath(staticPath);
-            gameManager.Enemies.Add(enemy);
+            gameManager.AddEnemy(enemy);
         }
 
         private void CheckForLoss()
