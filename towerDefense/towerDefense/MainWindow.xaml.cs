@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -24,6 +24,9 @@ namespace towerDefense
         private DispatcherTimer enemySpawnTimer = new DispatcherTimer();
         private DispatcherTimer gameTimer = new DispatcherTimer();
         private DispatcherTimer countdownTimer = new DispatcherTimer();
+        private DispatcherTimer difficultyTimer = new DispatcherTimer();
+
+        private int difficultyLevel = 0;
 
         private int countdownValue = 5;
 
@@ -37,7 +40,9 @@ namespace towerDefense
             InitializeComponent();
 
             gameManager = new GameManager();
+
             gameManager.OnMoneyChanged += UpdateMoneyDisplay;
+            gameManager.OnTowerCountChanged += UpdateTowerCountDisplay;
 
             switch (level)
             {
@@ -106,6 +111,16 @@ namespace towerDefense
             countdownTimer.Start();
         }
 
+        private void UpdateMoneyDisplay(int money)
+        {
+            MoneyTextBlock.Text = $"💰 {money}";
+        }
+
+        private void UpdateTowerCountDisplay(int towerCount)
+        {
+            TowerCountTextBlock.Text = $"🏰 {towerCount}";
+        }
+
         private void StopAllTimers()
         {
             gameLoopTimer.Stop();
@@ -169,6 +184,10 @@ namespace towerDefense
             enemySpawnTimer.Interval = TimeSpan.FromSeconds(2);
             enemySpawnTimer.Tick += SpawnEnemy;
             enemySpawnTimer.Start();
+
+            difficultyTimer.Interval = TimeSpan.FromSeconds(15);
+            difficultyTimer.Tick += IncreaseDifficulty;
+            difficultyTimer.Start();
 
             SpawnEnemy(null, null);
         }
@@ -243,8 +262,6 @@ namespace towerDefense
                 MessageBox.Show("Недостаточно денег или башня уже установлена!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-
-            UpdateMoneyDisplay(gameManager.PlayerMoney);
         }
 
         private void SpawnEnemy(object sender, EventArgs e)
@@ -253,9 +270,30 @@ namespace towerDefense
             int startX = startCell.col * CellSize;
             int startY = startCell.row * CellSize;
 
-            var enemy = new Enemy(startX, startY, 200, 3);
+            int baseHealth = 100;
+            int baseSpeed = 3;
+
+            int scaledHealth = baseHealth + (50 * difficultyLevel);
+            int scaledSpeed = baseSpeed + (1 * difficultyLevel);
+
+            var enemy = new Enemy(startX, startY, scaledHealth, scaledSpeed);
             enemy.SetPath(staticPath);
             gameManager.AddEnemy(enemy);
+        }
+
+        private void IncreaseDifficulty(object sender, EventArgs e)
+        {
+            difficultyLevel++;
+
+            foreach (var enemy in gameManager.Enemies.Where(e => e.IsActive))
+            {
+                enemy.IncreaseStats(30, 2);
+            }
+
+            DifficultyTextBlock.Text = $"🔥 {difficultyLevel}";
+
+            MessageBox.Show("Сложность увеличилась!\nВраги стали сильнее!",
+                            "Повышение сложности", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void CheckForLoss()
@@ -266,7 +304,6 @@ namespace towerDefense
                 StopAllTimers();
 
                 MessageBox.Show("Вы проиграли!", "Игра окончена");
-                //Application.Current.Shutdown();
 
                 LevelSelection levelSelection = new LevelSelection();
                 levelSelection.Show();
@@ -282,18 +319,12 @@ namespace towerDefense
                 isGameOver = true;
                 StopAllTimers();
                 MessageBox.Show("Вы выиграли!", "Игра окончена");
-                //Application.Current.Shutdown();
 
                 LevelSelection levelSelection = new LevelSelection();
                 levelSelection.Show();
 
                 this.Close();
             }
-        }
-
-        private void UpdateMoneyDisplay(int money)
-        {
-            MoneyTextBlock.Text = money.ToString();
         }
 
         private void RenderGame()
@@ -323,7 +354,8 @@ namespace towerDefense
                     Height = 45,
                     Stroke = Brushes.Black,
                     StrokeThickness = 1,
-                    Fill = Brushes.Black
+                    Fill = Brushes.Black,
+                    Tag = enemy
                 };
 
                 Canvas.SetLeft(enemyRect, enemy.X);
@@ -352,13 +384,30 @@ namespace towerDefense
                     Height = 45,
                     Stroke = Brushes.Black,
                     StrokeThickness = 1,
-                    Fill = Brushes.Blue
+                    Fill = Brushes.Blue,
+                    Tag = tower
                 };
 
                 Canvas.SetLeft(towerRect, tower.X);
                 Canvas.SetTop(towerRect, tower.Y);
 
+                towerRect.MouseLeftButtonDown += Tower_MouseLeftButtonDown;
+
                 GameCanvas.Children.Add(towerRect);
+
+                var levelText = new TextBlock
+                {
+                    Text = $"Lvl {tower.Level}",
+                    FontSize = 12,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = Brushes.White,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+
+                Canvas.SetLeft(levelText, tower.X + 10);
+                Canvas.SetTop(levelText, tower.Y + 5);
+
+                GameCanvas.Children.Add(levelText);
 
                 foreach (var projectile in tower.Projectiles)
                 {
@@ -373,6 +422,21 @@ namespace towerDefense
                     Canvas.SetTop(projectileRect, projectile.Y - projectileRect.Height / 2);
 
                     GameCanvas.Children.Add(projectileRect);
+                }
+            }
+        }
+
+        private void Tower_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Rectangle towerRect && towerRect.Tag is Tower clickedTower)
+            {
+                if (clickedTower.Upgrade(gameManager))
+                {
+                    MessageBox.Show($"Башня улучшена до уровня {clickedTower.Level}!", "Улучшение");
+                }
+                else
+                {
+                    MessageBox.Show("Недостаточно денег или достигнут максимальный уровень!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }

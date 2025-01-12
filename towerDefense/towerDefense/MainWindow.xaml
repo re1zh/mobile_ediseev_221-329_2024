@@ -14,40 +14,30 @@
             <ColumnDefinition Width="735"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0" Background="Gray" >
-            <TextBlock Text="ВРЕМЯ ДО КОНЦА:" 
-                       FontSize="16" 
-                       FontWeight="Bold" 
-                       Foreground="White" 
-                       Margin="0,10,0,5" 
-                       HorizontalAlignment="Center"/>
+        <StackPanel Grid.Column="0" Background="LightGray" Margin="10">
+            <TextBlock Text="📊 СТАТИСТИКА" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
 
-            <TextBlock Name="TimerTextBlock" 
-                       Text="60" 
-                       FontSize="24" 
-                       FontWeight="Bold" 
-                       Foreground="White" 
-                       HorizontalAlignment="Center" 
-                       Margin="0,0,0,20"/>
-            <TextBlock Text="ДЕНЬГИ:" 
-               FontSize="16" 
-               FontWeight="Bold" 
-               Foreground="White" 
-               Margin="0,20,0,5" 
-               HorizontalAlignment="Center"/>
+            <TextBlock Text="💰 Деньги:" FontSize="16"/>
+            <TextBlock Name="MoneyTextBlock" Text="0" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
 
-            <TextBlock Name="MoneyTextBlock" 
-               Text="15" 
-               FontSize="24" 
-               FontWeight="Bold" 
-               Foreground="Yellow" 
-               HorizontalAlignment="Center"/>
-            
-            <Button Content="Выход в меню" 
-                    Width="150" 
-                    Height="40" 
-                    Margin="0,180,0,0"
-                    HorizontalAlignment="Center"
+            <TextBlock Text="⏳ Время:" FontSize="16"/>
+            <TextBlock Name="TimerTextBlock" Text="60" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+
+            <TextBlock Text="🔥 Уровень сложности:" FontSize="16"/>
+            <TextBlock Name="DifficultyTextBlock" Text="1" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+
+            <TextBlock Text="🏰 Количество башен:" FontSize="16"/>
+            <TextBlock Name="TowerCountTextBlock" Text="0" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+
+            <TextBlock Text="💵 Стоимость объектов:" FontSize="16" Margin="0,10,0,5"/>
+            <TextBlock Text="Враг: +5" FontSize="14"/>
+            <TextBlock Text="Башня: -10" FontSize="14"/>
+            <TextBlock Text="Улучшение башни: -15" FontSize="14"/>
+
+            <Button Content="Выйти в меню" 
+                    Width="200"
+                    FontSize="16" 
+                    Margin="0,30,0,0" 
                     Click="ExitButton_Click"/>
         </StackPanel>
 

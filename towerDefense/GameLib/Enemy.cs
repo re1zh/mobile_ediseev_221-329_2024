@@ -94,5 +94,12 @@
                 }
             }
         }
+
+        public void IncreaseStats(int healthIncrement, int speedIncrement)
+        {
+            Health += healthIncrement;
+            MaxHealth += healthIncrement;
+            Speed += speedIncrement;
+        }
     }
 }

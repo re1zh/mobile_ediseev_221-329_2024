@@ -1,4 +1,7 @@
-﻿namespace GameLib
+﻿using System.Windows;
+using System.Windows.Threading;
+
+namespace GameLib
 {
     public class GameManager
     {
@@ -11,6 +14,7 @@
         private const int EnemyReward = 5;
 
         public event Action<int> OnMoneyChanged;
+        public event Action<int> OnTowerCountChanged;
 
         public IReadOnlyList<Enemy> Enemies => _enemies.AsReadOnly();
         public IReadOnlyList<Tower> Towers => _towers.AsReadOnly();
@@ -18,6 +22,12 @@
 
         public GameManager()
         {
+            OnMoneyChanged?.Invoke(_playerMoney);
+        }
+
+        public void SpendMoney(int amount)
+        {
+            _playerMoney -= amount;
             OnMoneyChanged?.Invoke(_playerMoney);
         }
 
@@ -35,9 +45,11 @@
                 return false;
 
             _playerMoney -= TowerCost;
-            _towers.Add(new Tower(x, y, 100, 20, 10));
+            _towers.Add(new Tower(x, y, 100, 10, 10));
 
             OnMoneyChanged?.Invoke(_playerMoney);
+            OnTowerCountChanged?.Invoke(_towers.Count);
+
             return true;
         }
 
