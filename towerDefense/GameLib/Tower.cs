@@ -1,5 +1,12 @@
 ﻿namespace GameLib
 {
+    public enum TowerType
+    {
+        Archer,
+        Cannon,
+        Frost
+    }
+
     public class Tower : GameObject
     {
         private int _range;
@@ -7,10 +14,10 @@
         private int _fireRate;
         private int _currentCooldown = 0;
         private List<Projectile> _projectiles = new List<Projectile>();
+        private TowerType _towerType;
 
         private int _level = 1;
-
-        private const int MaxLevel = 3;         // Максимальный уровень улучшения
+        private const int MaxLevel = 3;
 
         public int Range
         {
@@ -30,17 +37,38 @@
             private set => _fireRate = value;
         }
 
+        public TowerType Type => _towerType;
+
         public int Level => _level;
 
         public IReadOnlyList<Projectile> Projectiles => _projectiles.AsReadOnly();
 
-        public Tower(int x, int y, int range, int damage, int fireRate)
+        public Tower(int x, int y, TowerType type)
         {
             X = x;
             Y = y;
-            Range = range;
-            Damage = damage;
-            FireRate = fireRate;
+            _towerType = type;
+
+            switch (type)
+            {
+                case TowerType.Archer:
+                    _range = 120;
+                    _damage = 25;
+                    _fireRate = 20;
+                    break;
+
+                case TowerType.Cannon:
+                    _range = 100;
+                    _damage = 90;
+                    _fireRate = 70;
+                    break;
+
+                case TowerType.Frost:
+                    _range = 100;
+                    _damage = 15;
+                    _fireRate = 40;
+                    break;
+            }
         }
 
         public Enemy FindTarget(IEnumerable<Enemy> enemies)
@@ -91,7 +119,8 @@
                     10,
                     Damage,
                     target,
-                    gameManager
+                    gameManager,
+                    Type
                 );
                 _projectiles.Add(projectile);
                 _currentCooldown = FireRate;

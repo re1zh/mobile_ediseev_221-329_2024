@@ -13,7 +13,7 @@ namespace towerDefense
     {
         private const int CellSize = 45;
         private const int GridWidth = 16;
-        private const int GridHeight = 9;
+        private const int GridHeight = 11;
         private Rectangle[,] gridCells = new Rectangle[GridHeight, GridWidth];
 
         private List<(int row, int col)> staticPath = new List<(int row, int col)> { };
@@ -34,6 +34,26 @@ namespace towerDefense
         private int elapsedSeconds = 0;
 
         private bool isGameOver = false;
+
+        private TowerType selectedTowerType = TowerType.Archer;
+
+        private void SelectArcherTower(object sender, RoutedEventArgs e)
+        {
+            selectedTowerType = TowerType.Archer;
+            MessageBox.Show("Вы выбрали 🏹 Стрелковую башню.");
+        }
+
+        private void SelectCannonTower(object sender, RoutedEventArgs e)
+        {
+            selectedTowerType = TowerType.Cannon;
+            MessageBox.Show("Вы выбрали 💣 Пушечную башню.");
+        }
+
+        private void SelectFrostTower(object sender, RoutedEventArgs e)
+        {
+            selectedTowerType = TowerType.Frost;
+            MessageBox.Show("Вы выбрали ❄️ Замедляющую башню.");
+        }
 
         public MainWindow(int level)
         {
@@ -74,11 +94,13 @@ namespace towerDefense
                 case 3:
                     staticPath = new List<(int row, int col)>
                     {
-                        (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (4, 1), (4, 2), (3, 2),
-                        (2, 2), (2, 3), (2, 4), (3, 4), (4, 4), (4, 5), (4, 6), (3, 6),
-                        (2, 6), (2, 7), (2, 8), (3, 8), (4, 8), (4, 9), (4, 10), (3, 10),
-                        (2, 10), (2, 11), (2, 12), (3, 12), (4, 12), (4, 13), (4, 14),
-                        (4, 15)
+                        (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (5, 1), (5, 2),
+                        (4, 2), (3, 2), (3, 3), (3, 4), (4, 4), (5, 4), (6, 4), (7, 4),
+                        (7, 5), (7, 6), (6, 6), (5, 6), (5, 7), (5, 8), (6, 8), (7, 8),
+                        (8, 8), (9, 8), (10, 8), (10, 9), (10, 10), (9, 10), (8, 10),
+                        (8, 11), (8, 12), (9, 12), (10, 12), (10, 13), (10, 14), (9, 14),
+                        (8, 14), (7, 14), (6, 14), (5, 14), (4, 14), (3, 14), (2, 14),
+                        (1, 14), (0, 14), (0, 15), (0, 16)
                     };
                     break;
                 default:
@@ -185,7 +207,7 @@ namespace towerDefense
             enemySpawnTimer.Tick += SpawnEnemy;
             enemySpawnTimer.Start();
 
-            difficultyTimer.Interval = TimeSpan.FromSeconds(15);
+            difficultyTimer.Interval = TimeSpan.FromSeconds(20);
             difficultyTimer.Tick += IncreaseDifficulty;
             difficultyTimer.Start();
 
@@ -216,7 +238,7 @@ namespace towerDefense
                             Height = CellSize,
                             Stroke = Brushes.Black,
                             StrokeThickness = 1,
-                            Fill = Brushes.Green
+                            Fill = Brushes.LightGreen
                         };
                     }
                     else 
@@ -250,6 +272,35 @@ namespace towerDefense
                     };
                 }
             }
+            DrawPathArrows();
+        }
+
+        private void DrawPathArrows()
+        {
+            for (int i = 0; i < staticPath.Count - 1; i++)
+            {
+                var (fromRow, fromCol) = staticPath[i];
+                var (toRow, toCol) = staticPath[i + 1];
+
+                double startX = fromCol * CellSize + CellSize / 2;
+                double startY = fromRow * CellSize + CellSize / 2;
+
+                double endX = toCol * CellSize + CellSize / 2;
+                double endY = toRow * CellSize + CellSize / 2;
+
+                var arrowLine = new Line
+                {
+                    X1 = startX,
+                    Y1 = startY,
+                    X2 = endX,
+                    Y2 = endY,
+                    Stroke = Brushes.DarkGreen,
+                    StrokeThickness = 3,
+                    StrokeEndLineCap = PenLineCap.Triangle
+                };
+
+                GameCanvas.Children.Add(arrowLine);
+            }
         }
 
         private void CreateTower(int col, int row)
@@ -257,7 +308,7 @@ namespace towerDefense
             int x = col * CellSize;
             int y = row * CellSize;
 
-            if (!gameManager.TryPlaceTower(x, y))
+            if (!gameManager.TryPlaceTower(x, y, selectedTowerType))
             {
                 MessageBox.Show("Недостаточно денег или башня уже установлена!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -270,13 +321,30 @@ namespace towerDefense
             int startX = startCell.col * CellSize;
             int startY = startCell.row * CellSize;
 
-            int baseHealth = 100;
-            int baseSpeed = 3;
+            Random rand = new Random();
+            int enemyTypeChoice = rand.Next(0, 3);
 
-            int scaledHealth = baseHealth + (50 * difficultyLevel);
-            int scaledSpeed = baseSpeed + (1 * difficultyLevel);
+            Enemy enemy;
 
-            var enemy = new Enemy(startX, startY, scaledHealth, scaledSpeed);
+            switch (enemyTypeChoice)
+            {
+                case 0:
+                    enemy = new Enemy(startX, startY, 100, 2, EnemyType.Grunt);
+                    break;
+
+                case 1:
+                    enemy = new Enemy(startX, startY, 200, 1, EnemyType.Tank);
+                    break;
+
+                case 2:
+                    enemy = new Enemy(startX, startY, 80, 3, EnemyType.Runner);
+                    break;
+
+                default:
+                    enemy = new Enemy(startX, startY, 100, 2, EnemyType.Grunt);
+                    break;
+            }
+
             enemy.SetPath(staticPath);
             gameManager.AddEnemy(enemy);
         }
@@ -287,7 +355,7 @@ namespace towerDefense
 
             foreach (var enemy in gameManager.Enemies.Where(e => e.IsActive))
             {
-                enemy.IncreaseStats(30, 2);
+                enemy.IncreaseStats(15, 1);
             }
 
             DifficultyTextBlock.Text = $"🔥 {difficultyLevel}";
@@ -333,7 +401,7 @@ namespace towerDefense
 
             foreach (var child in GameCanvas.Children)
             {
-                if (child is Rectangle rect && rect.Fill != Brushes.LightGray && rect.Fill != Brushes.Green)
+                if (child is Rectangle rect && rect.Fill != Brushes.LightGray && rect.Fill != Brushes.LightGreen)
                 {
                     elementsToRemove.Add((UIElement)child);
                 }
@@ -347,6 +415,27 @@ namespace towerDefense
             foreach (var enemy in gameManager.Enemies)
             {
                 double healthPercentage = (double)enemy.Health / enemy.MaxHealth;
+
+                Brush enemyColor;
+
+                switch (enemy.Type)
+                {
+                    case EnemyType.Grunt:
+                        enemyColor = Brushes.Red;
+                        break;
+
+                    case EnemyType.Tank:
+                        enemyColor = Brushes.Brown;
+                        break;
+
+                    case EnemyType.Runner:
+                        enemyColor = Brushes.Yellow;
+                        break;
+
+                    default:
+                        enemyColor = Brushes.Red;
+                        break;
+                }
 
                 var enemyRect = new Rectangle
                 {
@@ -367,7 +456,7 @@ namespace towerDefense
                 {
                     Width = 45,
                     Height = 45 * healthPercentage,
-                    Fill = Brushes.Red
+                    Fill = enemyColor,
                 };
 
                 Canvas.SetLeft(healthBar, enemy.X);
@@ -378,13 +467,30 @@ namespace towerDefense
 
             foreach (var tower in gameManager.Towers)
             {
+                Brush towerColor = Brushes.Blue;
+
+                switch (tower.Type)
+                {
+                    case TowerType.Archer:
+                        towerColor = Brushes.Green;
+                        break;
+
+                    case TowerType.Cannon:
+                        towerColor = Brushes.Gray;
+                        break;
+
+                    case TowerType.Frost:
+                        towerColor = Brushes.LightBlue;
+                        break;
+                }
+
                 var towerRect = new Rectangle
                 {
                     Width = 45,
                     Height = 45,
                     Stroke = Brushes.Black,
                     StrokeThickness = 1,
-                    Fill = Brushes.Blue,
+                    Fill = towerColor,
                     Tag = tower
                 };
 

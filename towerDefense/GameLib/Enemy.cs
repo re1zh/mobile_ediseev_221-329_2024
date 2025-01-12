@@ -1,10 +1,20 @@
 ﻿namespace GameLib
 {
+    public enum EnemyType
+    {
+        Grunt,
+        Tank,
+        Runner
+    }
+
     public class Enemy : GameObject
     {
         private int _health;
         private int _maxHealth;
         private int _speed;
+        private EnemyType _enemyType;
+        private int _reward;
+
         private List<(int row, int col)> _path = new List<(int row, int col)>();
         private int _currentPathIndex = 0;
         private bool _hasReachedEnd = false;
@@ -24,8 +34,12 @@
         public int Speed
         {
             get => _speed;
-            private set => _speed = value;
+            set => _speed = value;
         }
+
+        public EnemyType Type => _enemyType;
+
+        public int Reward => _reward;
 
         public bool HasReachedEnd
         {
@@ -33,13 +47,22 @@
             private set => _hasReachedEnd = value;
         }
 
-        public Enemy(int x, int y, int health, int speed)
+        public Enemy(int x, int y, int health, int speed, EnemyType type)
         {
             X = x;
             Y = y;
             Health = health;
             MaxHealth = health;
             Speed = speed;
+            _enemyType = type;
+
+            _reward = type switch
+            {
+                EnemyType.Grunt => 5,
+                EnemyType.Tank => 15,
+                EnemyType.Runner => 10,
+                _ => 5
+            };
         }
 
         public void SetPath(List<(int row, int col)> path)
@@ -86,7 +109,7 @@
                 IsActive = false;
                 try
                 {
-                    gameManager.RewardForEnemyKill();
+                    gameManager.RewardForEnemyKill(this);
                 }
                 catch (Exception e)
                 {

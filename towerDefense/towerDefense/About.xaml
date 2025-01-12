@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:towerDefense"
         mc:Ignorable="d"
-        Title="TowerDefense" Height="440" Width="985"
+        Title="TowerDefense" Height="530" Width="985"
         WindowStartupLocation="CenterScreen">
     <Grid Background="LightGray">
-        <TextBlock
+        <StackPanel>
+            <TextBlock
                 FontSize="24"
                 TextWrapping="Wrap"
                 Width="600"
@@ -21,8 +22,25 @@
             студентом группы 221-329<LineBreak/>
             Едисеевым Олегом Владимировичем <LineBreak/>
             Индивидуальный проект - Игра "TowerDefense"
-            
-        </TextBlock>
+            </TextBlock>
+
+            <TextBlock
+                FontSize="18"
+                TextWrapping="Wrap"
+                Width="600"
+                Margin="20"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                TextAlignment="Justify">
+            Правила:<LineBreak/>
+            На сетке есть размеченный путь, по которому идут вражеские юниты. 
+                Они бывают разных типов: обычный (красный), быстрый (желтый) и танк (темно-серый).
+                Также у игрока есть возможность ставить башни, чтобы защититься от врагов.
+                Их существует также 3 типа: стрелковая (зеленая), пушечная (серая) и ледяная (светло-голубая).
+                Ваша задача разместить башни так, чтобы ни один враг не добрался до конца размеченного пути.
+            </TextBlock>
+        </StackPanel>
+        
 
         <Button Content="Назад"
                 Width="200"

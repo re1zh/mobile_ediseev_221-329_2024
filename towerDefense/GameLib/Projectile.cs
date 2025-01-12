@@ -6,6 +6,7 @@
         private int _damage;
         private Enemy _target;
         private GameManager _gameManager;
+        private TowerType TowerType;
 
         public int Speed
         {
@@ -25,13 +26,14 @@
             private set => _target = value;
         }
 
-        public Projectile(int x, int y, int speed, int damage, Enemy target, GameManager gameManager)
+        public Projectile(int x, int y, int speed, int damage, Enemy target, GameManager gameManager, TowerType type)
         {
             X = x;
             Y = y;
             Speed = speed;
             Damage = damage;
             Target = target;
+            TowerType = type;
             _gameManager = gameManager;
         }
 
@@ -55,17 +57,36 @@
 
             if (distance < Speed)
             {
-                X = Target.X;
-                Y = Target.Y;
+                if (TowerType == TowerType.Frost)
+                {
+                    ApplySlowEffect(Target);
+                }
 
                 Target.TakeDamage(Damage, _gameManager);
-
                 IsActive = false;
             }
             else
             {
                 X += (int)(Speed * deltaX / distance);
                 Y += (int)(Speed * deltaY / distance);
+            }
+        }
+
+        private void ApplySlowEffect(Enemy target)
+        {
+            const int slowAmount = 2;
+            const int minSpeed = 1;
+            const int slowDuration = 100;
+
+            if (target.Speed > minSpeed)
+            {
+                target.Speed = Math.Max(minSpeed, target.Speed - slowAmount);
+
+                Task.Run(async () =>
+                {
+                    await Task.Delay(slowDuration * 16);
+                    target.Speed += slowAmount;
+                });
             }
         }
     }

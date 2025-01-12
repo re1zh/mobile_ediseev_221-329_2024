@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:towerDefense"
         mc:Ignorable="d"
-        Title="TowerDefense" Height="440" Width="985"
+        Title="TowerDefense" Height="530" Width="985"
         WindowStartupLocation="CenterScreen">
     <Grid Background="LightGray">
         <StackPanel Background="LightGray" 

@@ -8,10 +8,7 @@ namespace GameLib
         private List<Enemy> _enemies = new List<Enemy>();
         private List<Tower> _towers = new List<Tower>();
 
-        private int _playerMoney = 15;
-
-        private const int TowerCost = 10;
-        private const int EnemyReward = 5;
+        private int _playerMoney = 40;
 
         public event Action<int> OnMoneyChanged;
         public event Action<int> OnTowerCountChanged;
@@ -36,26 +33,38 @@ namespace GameLib
             _enemies.Add(enemy);
         }
 
-        public bool TryPlaceTower(int x, int y)
+        public bool TryPlaceTower(int x, int y, TowerType type)
         {
-            if (_playerMoney < TowerCost)
+            int cost = GetTowerCost(type);
+
+            if (_playerMoney < cost)
                 return false;
 
             if (_towers.Exists(t => t.X == x && t.Y == y))
                 return false;
 
-            _playerMoney -= TowerCost;
-            _towers.Add(new Tower(x, y, 100, 10, 10));
+            _playerMoney -= cost;
+            _towers.Add(new Tower(x, y, type));
 
             OnMoneyChanged?.Invoke(_playerMoney);
             OnTowerCountChanged?.Invoke(_towers.Count);
-
             return true;
         }
 
-        public void RewardForEnemyKill()
+        private int GetTowerCost(TowerType type)
         {
-            _playerMoney += EnemyReward;
+            return type switch
+            {
+                TowerType.Archer => 10,
+                TowerType.Cannon => 20,
+                TowerType.Frost => 15,
+                _ => 10
+            };
+        }
+
+        public void RewardForEnemyKill(Enemy enemy)
+        {
+            _playerMoney += enemy.Reward;
             OnMoneyChanged?.Invoke(_playerMoney);
         }
 
