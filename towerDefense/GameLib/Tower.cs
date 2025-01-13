@@ -52,20 +52,20 @@
             switch (type)
             {
                 case TowerType.Archer:
-                    _range = 120;
-                    _damage = 25;
-                    _fireRate = 20;
+                    _range = 100;
+                    _damage = 20;
+                    _fireRate = 30;
                     break;
 
                 case TowerType.Cannon:
-                    _range = 100;
-                    _damage = 90;
-                    _fireRate = 70;
+                    _range = 75;
+                    _damage = 80;
+                    _fireRate = 90;
                     break;
 
                 case TowerType.Frost:
-                    _range = 100;
-                    _damage = 15;
+                    _range = 120;
+                    _damage = 10;
                     _fireRate = 40;
                     break;
             }

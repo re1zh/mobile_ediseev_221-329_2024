@@ -233,7 +233,6 @@ namespace MinimalConsoleTD
         }
     }
 
-
     class Program
     {
         static void Main()

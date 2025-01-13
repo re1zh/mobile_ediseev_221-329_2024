@@ -36,8 +36,9 @@
 
             <Button Content="Выйти в меню" 
                     Width="200"
+                    Height="50"
                     FontSize="16" 
-                    Margin="0,80,0,0" 
+                    Margin="0,50,0,0" 
                     Click="ExitButton_Click"/>
         </StackPanel>
 

@@ -148,6 +148,7 @@ namespace towerDefense
             gameLoopTimer.Stop();
             enemySpawnTimer.Stop();
             gameTimer.Stop();
+            difficultyTimer.Stop();
         }
 
         private void CountdownTimer_Tick(object sender, EventArgs e)
