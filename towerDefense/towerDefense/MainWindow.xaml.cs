@@ -37,22 +37,34 @@ namespace towerDefense
 
         private TowerType selectedTowerType = TowerType.Archer;
 
+        private void HighlightSelectedButton(Button selectedButton)
+        {
+            ArcherTowerButton.Background = Brushes.LightGray;
+            CannonTowerButton.Background = Brushes.LightGray;
+            IceTowerButton.Background = Brushes.LightGray;
+
+            selectedButton.Background = Brushes.LightGreen;
+        }
+
         private void SelectArcherTower(object sender, RoutedEventArgs e)
         {
             selectedTowerType = TowerType.Archer;
-            MessageBox.Show("Вы выбрали 🏹 Стрелковую башню.");
+            HighlightSelectedButton(ArcherTowerButton);
+            //MessageBox.Show("Вы выбрали 🏹 Стрелковую башню.");
         }
 
         private void SelectCannonTower(object sender, RoutedEventArgs e)
         {
             selectedTowerType = TowerType.Cannon;
-            MessageBox.Show("Вы выбрали 💣 Пушечную башню.");
+            HighlightSelectedButton(CannonTowerButton);
+            //MessageBox.Show("Вы выбрали 💣 Пушечную башню.");
         }
 
         private void SelectFrostTower(object sender, RoutedEventArgs e)
         {
             selectedTowerType = TowerType.Frost;
-            MessageBox.Show("Вы выбрали ❄️ Замедляющую башню.");
+            HighlightSelectedButton(IceTowerButton);
+            //MessageBox.Show("Вы выбрали ❄️ Замедляющую башню.");
         }
 
         public MainWindow(int level)
@@ -361,8 +373,8 @@ namespace towerDefense
 
             DifficultyTextBlock.Text = $"🔥 {difficultyLevel}";
 
-            MessageBox.Show("Сложность увеличилась!\nВраги стали сильнее!",
-                            "Повышение сложности", MessageBoxButton.OK, MessageBoxImage.Warning);
+            //MessageBox.Show("Сложность увеличилась!\nВраги стали сильнее!",
+            //                "Повышение сложности", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         private void CheckForLoss()

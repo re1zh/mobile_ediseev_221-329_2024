@@ -30,9 +30,10 @@
             <TextBlock Name="TowerCountTextBlock" Text="0" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
 
             <TextBlock Text="🏰 Выберите башню:" FontSize="16" Margin="0,0,0,5"/>
-            <Button Content="🏹 Стрелковая (10)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectArcherTower"/>
-            <Button Content="💣 Пушечная (20)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectCannonTower"/>
-            <Button Content="❄️ Ледяная (15)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectFrostTower"/>
+
+            <Button Name="ArcherTowerButton" Content="🏹 Стрелковая (10)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectArcherTower"/>
+            <Button Name="CannonTowerButton" Content="💣 Пушечная (20)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectCannonTower"/>
+            <Button Name="IceTowerButton" Content="❄️ Ледяная (15)" Width="200" FontSize="14" Margin="0,5,0,5" Click="SelectFrostTower"/>
 
             <Button Content="Выйти в меню" 
                     Width="200"
